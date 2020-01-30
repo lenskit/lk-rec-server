@@ -9,6 +9,7 @@ class Controller:
         dbManager = DbManager()
         dbManager.create_structure_with_data(dataManager.get_ratings())
 
+    # Get recommendations from data file or database
     def get_recs(self, user_id, nr_recs, algo, items):
         #dataManager = DataManager()
         #ratings = dataManager.get_ratings()
@@ -22,6 +23,13 @@ class Controller:
         # return recs
         return lkProxy.get_recs(user_id, nr_recs, algo, ratings, items)
     
+    # Get recommendations using a saved model
+    def get_recs_using_model(self, user_id, nr_recs, algo, items):
+        modelManager = ModelManager()
+        lkProxy = LenskitProxy()
+        model = modelManager.load(algo)
+        return lkProxy.get_recs_from_model(model, user_id, nr_recs,items)
+
     def save_models(self, algos):
         lkProxy = LenskitProxy()
         #dataManager = DataManager()

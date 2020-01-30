@@ -23,7 +23,7 @@ def save_models(algos):
 @app.route('/lkpy/recommend/<algo>/<int:user_id>/<int:num_recs>', methods=['GET'])
 def recommend(algo, user_id, num_recs):
     ctrl = Controller()
-    recs = ctrl.get_recs(user_id, num_recs, algo, None)
+    recs = ctrl.get_recs_using_model(user_id, num_recs, algo, None)
     return jsonify({'recommendations': recs})
  
  # Test local urls:

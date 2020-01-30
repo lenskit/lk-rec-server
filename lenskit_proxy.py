@@ -16,6 +16,19 @@ class LenskitProxy:
                     recs.append({index : round(value, 3)})
         return recs
 
+    def get_recs_from_model(self, model, user, nr_recs, items):
+        recs = []
+        if isinstance(model, Recommender):
+            df_recs = model.recommend(user, int(nr_recs))
+            for index, row in df_recs.iterrows():
+                recs.append( round(row['item'], 3))
+        elif isinstance(model, Predictor):
+            df_recs = model.predict_for_user(user, items)
+            for index, value in df_recs.iteritems():
+                if not math.isnan(value):
+                    recs.append({index : round(value, 3)})
+        return recs
+
     def get_algo_class(self, algo):
         if algo == 'popular':
             return basic.Popular()
