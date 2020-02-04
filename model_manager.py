@@ -1,3 +1,4 @@
+import os
 import pickle
 
 class ModelManager:
@@ -9,7 +10,12 @@ class ModelManager:
         # Its important to use binary mode
         if not file_name.count(".pickle"):
             file_name += ".pickle"
-        data_file = open(self.directory_path + file_name, 'ab') 
+        full_file_name = self.directory_path + file_name
+
+        if os.path.exists(full_file_name):
+            os.remove(full_file_name)
+
+        data_file = open(full_file_name, 'ab') 
         
         # source, destination 
         pickle.dump(data, data_file)
@@ -19,7 +25,8 @@ class ModelManager:
         # for reading also binary mode is important
         if not file_name.count(".pickle"):
             file_name += ".pickle"
-        data_file = open(self.directory_path + file_name, 'rb')      
+        full_file_name = self.directory_path + file_name
+        data_file = open(full_file_name, 'rb')      
         model = pickle.load(data_file)
         data_file.close()
         return model

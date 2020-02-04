@@ -36,6 +36,7 @@ class Controller:
         #ratings = dataManager.get_ratings()
         dbManager = DbManager()
         ratings = dbManager.get_ratings()
+        print(len(ratings))
         modelManager = ModelManager()
         for algo in algos.split(','):
             model = lkProxy.create_model(algo, ratings)

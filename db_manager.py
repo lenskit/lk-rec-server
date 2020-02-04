@@ -40,4 +40,4 @@ class DbManager:
     
     def get_ratings(self):
         conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("select user, item, rating, timestamp from ratings LIMIT 5;", conn)
+        return pd.read_sql_query("select user, item, rating, timestamp from ratings;", conn)
