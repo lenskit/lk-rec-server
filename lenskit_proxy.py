@@ -12,7 +12,7 @@ class LenskitProxy:
         if isinstance(algo_class, Recommender):
             df_recs = algo_class.recommend(user, int(nr_recs))
             for index, row in df_recs.iterrows():
-                recs.append(str(round(row['item'], 3)) + " : " + str(round(row['score'], 3)))
+                recs.append({'item': round(row['item'], 3), 'score': round(row['score'], 3)})
         elif isinstance(algo_class, Predictor):
             df_recs = algo_class.predict_for_user(user, items)
             for index, value in df_recs.iteritems():
@@ -25,7 +25,7 @@ class LenskitProxy:
         if isinstance(model, Recommender):
             df_recs = model.recommend(user, int(nr_recs))
             for index, row in df_recs.iterrows():
-                recs.append(str(round(row['item'], 3)) + " : " + str(round(row['score'], 3)))
+                recs.append({'item': round(row['item'], 3), 'score': round(row['score'], 3)})
         elif isinstance(model, Predictor):
             df_recs = model.predict_for_user(user, items)
             for index, value in df_recs.iteritems():

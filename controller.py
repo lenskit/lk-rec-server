@@ -41,3 +41,12 @@ class Controller:
         for algo in algos.split(','):
             model = lkProxy.create_model(algo, ratings)
             modelManager.store(model, algo)
+    
+    def get_model_info(self, algo):
+        return None
+
+    def upload_model(self, algo, data):
+        return None
+
+    def preload_models(self):
+        return None
