@@ -25,6 +25,11 @@ def preload_models():
     return jsonify({"result": 'ok'})
 
 
+# TODO
+# Default algo path:
+# 	/recommendations
+
+
 # Test local urls:
 # http://127.0.0.1:5001/lkpy/algorithms/popular/recommendations?user_id=2038&num_recs=10
 #@app.route('/lkpy/algorithms/<algo>/recommendations/<int:user_id>/<int:num_recs>', methods=['GET', 'POST'])
