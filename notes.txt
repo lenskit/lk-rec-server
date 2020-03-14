@@ -1,0 +1,16 @@
+MySQL on Mac
+odbc connector: https://dev.mysql.com/downloads/connector/odbc/
+iodbc: http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads#Mac%20OS%20X
+pyodbc
+brew install unixodbc
+configure ‎⁨/⁨Users⁩/⁨carlos⁩/⁨Library⁩/⁨ODBC⁩/odbcinst.ini with:
+[ODBC Drivers]
+MySQL ODBC 8.0 ANSI Driver = Installed
+
+
+[ODBC Connection Pooling]
+PerfMon = 0
+Retry Wait =
+
+[MySQL ODBC 8.0 ANSI Driver]
+Driver = /usr/local/mysql-connector-odbc-8.0.19-macos10.15-x86-64bit/lib/libmyodbc8a.so
