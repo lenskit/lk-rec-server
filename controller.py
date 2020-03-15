@@ -10,7 +10,7 @@ class Controller:
         movies = dataManager.get_movies()
         ratings = dataManager.get_ratings()
         links = dataManager.get_links()
-        dbManager.create_structure_with_data(movies, ratings, links)
+        dbManager.create_db_structure_with_data(movies, ratings, links)
 
     # Get recommendations from data file or database
     def get_recs(self, user_id, nr_recs, algo, items):

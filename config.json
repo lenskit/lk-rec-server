@@ -1,8 +1,5 @@
 {
-    "algorithms":
-    {
-        
-    },
+    "default_algorithm": "popular",
     "db_connection":
     {
         "db_engine": "mysql",

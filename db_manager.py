@@ -1,71 +1,83 @@
 # TODO: change to use any sql db, use sqlite3 for now.
 import sqlite3
 import pandas as pd
-import pyodbc
-import sqlalchemy
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 import urllib
+from config_reader import ConfigReader
+from pandas.io import sql
+from datetime import datetime
 
 class DbManager:
     def __init__(self):
-        self.connString = "data.db" # 'data.db'
-        self.type = "sqlite"
+        # self.connString = "data.db" # 'data.db'
+        # self.type = "sqlite"
+        reader = ConfigReader()
+        db_connection = reader.get_value("db_connection")        
+        self.conn_string = '{db_engine}+{connector}://{user}:{password}@{server}/{database}'.format(
+            db_engine=db_connection['db_engine'],
+            connector=db_connection['connector'],
+            user=db_connection['user'],
+            password=db_connection['password'],
+            server=db_connection['server'],
+            database=db_connection['database'])
     
-    def get_odbc_conn(self):
-        connstr="Driver={MySQL ODBC 8.0 ANSI Driver};Server=localhost;Port=3306;Database=db;User=root;Password=dingoabc123;charset=UTF8"
-        conn = pyodbc.connect(connstr)
-        return conn
+    # def get_odbc_conn(self):
+    #     connstr="Driver={MySQL ODBC 8.0 ANSI Driver};Server=localhost;Port=3306;Database=db;User=root;Password=dingoabc123;charset=UTF8"
+    #     conn = pyodbc.connect(connstr)
+    #     return conn
 
-    def create_structure_with_data(self, movies, ratings, links):
-        if self.type == "sqlite":
-            conn = sqlite3.connect(self.connString)
-            #c = conn.cursor()
-            movies.to_sql("movies", conn, if_exists="replace")
-            ratings.to_sql("ratings", conn, if_exists="replace")
-            links.to_sql("links", conn, if_exists="replace")
-        else:
-            conn = self.get_odbc_conn()
-            # conn = sqlalchemy.create_engine(
-            #        "mysql+pyodbc://root:dingoabc123@localhost/db",
-            #        echo=False)
-            # params = urllib.parse.quote_plus("Driver={MySQL ODBC 8.0 ANSI Driver};Server=localhost;Port=3306;Database=db;User=root;Password=dingoabc123;")
-            # conn = sqlalchemy.create_engine("mysql+pyodbc:///?odbc_connect=%s" % params)
+    def create_db_structure_with_data(self, movies, ratings, links):
+    #     if self.type == "sqlite":
+    #         conn = sqlite3.connect(self.connString)
+    #         #c = conn.cursor()
+    #         movies.to_sql("movies", conn, if_exists="replace")
+    #         ratings.to_sql("ratings", conn, if_exists="replace")
+    #         links.to_sql("links", conn, if_exists="replace")
+    #     else:
 
-            # ratings.to_sql("movies", conn, if_exists="replace")
+            engine = create_engine(self.conn_string)
 
-            # # Drop table
-            conn.execute("DROP TABLE IF EXISTS movies")
+            # Drop tables
+            sql.execute("DROP TABLE IF EXISTS movies", engine)
+            sql.execute("DROP TABLE IF EXISTS ratings", engine)
 
-            # # Create table
-            conn.execute('''CREATE TABLE movies
-                    (movieId INTEGER, title VARCHAR(200), genres VARCHAR(100))''')
+            # # Create tables
+            sql.execute('''CREATE TABLE movies
+                    (movieId INTEGER, title VARCHAR(200), genres VARCHAR(100))''', engine)
+            sql.execute('''CREATE TABLE ratings
+                    (userId INTEGER, itemId INTEGER, rating FLOAT, timestamp TIMESTAMP)''', engine)
+           
             count = 0
-
             for index, row in movies.iterrows():
-                # Insert a row of data
-                #c.execute("INSERT INTO ratings VALUES (" + row['user'] + "," + row['item'] + "," + row['rating'] + ",'" + row['timestamp'] + "')")
-
-                movieId = row['movieId']
-                title = row['title']
-                genres = row['genres']
-                # c.execute("INSERT INTO ratings VALUES (?,?,?,?)", (row['user'], row['item'], row['rating'], row['timestamp']))
-                # conn.execute(f"INSERT INTO movies(movieId, title, genres) VALUES ({movieId},'{title}','{genres}')")
-                conn.execute("INSERT INTO movies(movieId, genres) VALUES (?,?)", movieId, genres)
-                
+                sql.execute("INSERT INTO movies VALUES ({movieId}, '{title}', '{genres}')".format(
+                    movieId=row['movieId'],
+                    title=row['title'].replace("'", r"\'"),
+                    genres=row['genres']), 
+                    engine)
                 count += 1
                 if count >= 100:
                     break
-            
-        conn.commit()
-        conn.close()
-    
+
+            count = 0
+            for index, row in ratings.iterrows():
+                sql.execute("INSERT INTO ratings VALUES ({userId}, {itemId}, {rating}, '{timestamp}')".format(
+                    userId=row['userId'],
+                    itemId=row['movieId'],
+                    rating=row['rating'],
+                    timestamp=datetime.utcfromtimestamp(int(row['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')),
+                    engine)
+                count += 1
+                if count >= 100:
+                    break
+ 
     def get_ratings(self):
         conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("select user, item, rating, timestamp from ratings;", conn)
+        return pd.read_sql_query("SELECT userId, itemId, rating, timestamp FROM ratings;", conn)
 
     def get_movies(self):
         conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("select movieId, title, genres from movies;", conn)
+        return pd.read_sql_query("SELECT movieId, title, genres FROM movies;", conn)
 
     def get_links(self):
         conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("select movieId, imdbId, tmdbId from links;", conn)
+        return pd.read_sql_query("SELECT movieId, imdbId, tmdbId FROM links;", conn)

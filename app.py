@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, abort, make_response, request
 from controller import Controller
-#from recommender import Recommender
+from config_reader import ConfigReader
 
 app = Flask(__name__)
 
@@ -25,9 +25,13 @@ def preload_models():
     return jsonify({"result": 'ok'})
 
 
-# TODO
 # Default algo path:
 # 	/recommendations
+@app.route('/recommendations', methods=['GET', 'POST'])
+def recommend_default():
+    reader = ConfigReader()
+    algo = reader.get_value("default_algorithm")
+    return recommend(algo)
 
 
 # Test local urls:
@@ -44,12 +48,12 @@ def recommend(algo):
     return jsonify({'recommendations': recs})
  
  # Test local urls:
- # http://127.0.0.1:5001/predict/bias/22/5,102,203,304,400
- # http://127.0.0.1:5001/predict/itemitem/22/100,101,102
- # http://127.0.0.1:5001/predict/useruser/22/100,101,102
- # http://127.0.0.1:5001/predict/biasedmf/22/100,101,102
- # http://127.0.0.1:5001/predict/implicitmf/22/100,101,102
- # http://127.0.0.1:5001/predict/funksvd/22/100,101,102
+ # http://127.0.0.1:5001/algorithms/bias/predictions/22/5,102,203,304,400
+ # http://127.0.0.1:5001/algorithms/itemitem/predictions/22/100,101,102
+ # http://127.0.0.1:5001/algorithms/useruser/predictions/22/100,101,102
+ # http://127.0.0.1:5001/algorithms/biasedmf/predictions/22/100,101,102
+ # http://127.0.0.1:5001/algorithms/implicitmf/predictions/22/100,101,102
+ # http://127.0.0.1:5001/algorithms/funksvd/predictions/22/100,101,102
 @app.route('/algorithms/<algo>/predictions', methods=['GET', 'POST'])
 def predict(algo):
     user_id = request.args.get('user_id', '')
