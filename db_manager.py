@@ -1,6 +1,5 @@
 # TODO: change to use any sql db, use sqlite3 for now.
 import sqlite3
-import pandas as pd
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 import urllib
 from config_reader import ConfigReader
@@ -47,18 +46,18 @@ class DbManager:
             sql.execute('''CREATE TABLE ratings
                     (userId INTEGER, itemId INTEGER, rating FLOAT, timestamp TIMESTAMP)''', engine)
            
-            count = 0
+            #count = 0
             for index, row in movies.iterrows():
                 sql.execute("INSERT INTO movies VALUES ({movieId}, '{title}', '{genres}')".format(
                     movieId=row['movieId'],
                     title=row['title'].replace("'", r"\'"),
                     genres=row['genres']), 
                     engine)
-                count += 1
-                if count >= 100:
-                    break
+                # count += 1
+                # if count >= 100:
+                #     break
 
-            count = 0
+            # count = 0
             for index, row in ratings.iterrows():
                 sql.execute("INSERT INTO ratings VALUES ({userId}, {itemId}, {rating}, '{timestamp}')".format(
                     userId=row['userId'],
@@ -66,18 +65,15 @@ class DbManager:
                     rating=row['rating'],
                     timestamp=datetime.utcfromtimestamp(int(row['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')),
                     engine)
-                count += 1
-                if count >= 100:
-                    break
+                # count += 1
+                # if count >= 100:
+                #     break
  
     def get_ratings(self):
-        conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("SELECT userId, itemId, rating, timestamp FROM ratings;", conn)
+        return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(self.conn_string))
 
     def get_movies(self):
-        conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("SELECT movieId, title, genres FROM movies;", conn)
+        return sql.read_sql("SELECT movieId, title, genres FROM movies;", create_engine(self.conn_string))
 
     def get_links(self):
-        conn = sqlite3.connect(self.connString)
-        return pd.read_sql_query("SELECT movieId, imdbId, tmdbId FROM links;", conn)
+        return sql.read_sql("SELECT movieId, imdbId, tmdbId FROM links;", create_engine(self.conn_string))

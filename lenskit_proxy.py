@@ -17,7 +17,7 @@ class LenskitProxy:
             df_recs = algo_class.predict_for_user(user, items)
             for index, value in df_recs.iteritems():
                 if not math.isnan(value):
-                    recs.append({index : round(value, 3)})
+                    recs.append({'item': index, 'score': round(value, 3)})
         return recs
 
     def get_recs_from_model(self, model, user, nr_recs, items):
@@ -30,7 +30,7 @@ class LenskitProxy:
             df_recs = model.predict_for_user(user, items)
             for index, value in df_recs.iteritems():
                 if not math.isnan(value):
-                    recs.append({index : round(value, 3)})
+                    recs.append({'item': index, 'score': round(value, 3)})
         return recs
 
     def get_algo_class(self, algo):

@@ -56,11 +56,12 @@ def recommend(algo):
  # http://127.0.0.1:5001/algorithms/funksvd/predictions/22/100,101,102
 @app.route('/algorithms/<algo>/predictions', methods=['GET', 'POST'])
 def predict(algo):
-    user_id = request.args.get('user_id', '')
+    user_id = int(request.args.get('user_id', ''))
     items = request.args.get('items', '')    
     ctrl = Controller()
     items = list(map(int, items.split(',')))
-    recs = ctrl.get_recs(user_id, None, algo, items)
+
+    recs = ctrl.get_recs_using_model(user_id, None, algo, items)
     return jsonify({'predictions': recs})
 
 @app.route('/algorithms/<algo>/info', methods=['GET'])
@@ -75,4 +76,4 @@ def upload_model(algo, data):
     return jsonify({'result': 'ok'})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)
