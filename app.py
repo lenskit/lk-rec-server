@@ -11,7 +11,7 @@ def create_structure():
     return jsonify({"result": 'ok'})
 
 # Save all the algo models to disk
-# http://127.0.0.1:5001/save_models/popular,bias,topn,itemitem,useruser,biasedmf,implicitmf,funksvd
+# http://127.0.0.1:5000/save_models/popular,bias,topn,itemitem,useruser,biasedmf,implicitmf,funksvd
 @app.route('/save_models/<algos>', methods=['GET'])
 def save_models(algos):
     ctrl = Controller()
@@ -60,6 +60,9 @@ def predict(algo):
     items = request.args.get('items', '')    
     ctrl = Controller()
     items = list(map(int, items.split(',')))
+
+    # TODO: Add these two parameters to use in the algos
+    # use exclusion_list and candidate_list
 
     recs = ctrl.get_recs_using_model(user_id, None, algo, items)
     return jsonify({'predictions': recs})

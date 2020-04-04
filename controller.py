@@ -1,3 +1,5 @@
+from os import path
+from datetime import datetime
 from lenskit_proxy import LenskitProxy
 from data_manager import DataManager
 from db_manager import DbManager
@@ -46,7 +48,15 @@ class Controller:
             modelManager.store(model, algo)
     
     def get_model_info(self, algo):
-        return None
+        model_file_dir_path = "files/" + algo + '.pickle'
+        creation_date = ""
+        updated_date = ""
+        size = 0
+        if path.exists(model_file_dir_path):
+            creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S') 
+            updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S')
+            size = path.getsize(model_file_dir_path) / 1000
+        return {"creation_date": creation_date + " UTC", "updated_date": updated_date + " UTC", "size": str(size) + " KB"}
 
     def upload_model(self, algo, data):
         return None
