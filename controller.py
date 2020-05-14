@@ -1,4 +1,4 @@
-from os import path
+from os import path, listdir
 from datetime import datetime
 from lenskit_proxy import LenskitProxy
 from data_manager import DataManager
@@ -6,13 +6,14 @@ from db_manager import DbManager
 from model_manager import ModelManager
 
 class Controller:
+    models = {}
+
     def create_db_structure_with_data(self):
         dataManager = DataManager()
         dbManager = DbManager()
         movies = dataManager.get_movies()
         ratings = dataManager.get_ratings()
-        links = dataManager.get_links()
-        dbManager.create_db_structure_with_data(movies, ratings, links)
+        dbManager.create_db_structure_with_data(movies, ratings)
 
     # Get recommendations from data file or database
     def get_recs(self, user_id, nr_recs, algo, items):
@@ -32,7 +33,10 @@ class Controller:
     def get_recs_using_model(self, user_id, nr_recs, algo, items):
         modelManager = ModelManager()
         lkProxy = LenskitProxy()
-        model = modelManager.load(algo)
+        model = Controller.models.get(algo, None)
+        if model == None:
+            print('Model not loaded in memory!!! Model will be load now for this request.')
+            model = modelManager.load(algo)
         return lkProxy.get_recs_from_model(model, user_id, nr_recs,items)
 
     def save_models(self, algos):
@@ -41,7 +45,7 @@ class Controller:
         #ratings = dataManager.get_ratings()
         dbManager = DbManager()
         ratings = dbManager.get_ratings()
-        print(len(ratings))
+        #print(len(ratings))
         modelManager = ModelManager()
         for algo in algos.split(','):
             model = lkProxy.create_model(algo, ratings)
@@ -58,8 +62,15 @@ class Controller:
             size = path.getsize(model_file_dir_path) / 1000
         return {"creation_date": creation_date + " UTC", "updated_date": updated_date + " UTC", "size": str(size) + " KB"}
 
-    def upload_model(self, algo, data):
-        return None
+    def upload_model(self, algo, file):
+        file_name = path.join('files/' + algo + '.pickle')
+        file.save(file_name)
 
-    def preload_models(self):
-        return None
+    @staticmethod
+    def preload_models():
+        model_file_dir_path = "files/"
+        modelManager = ModelManager()
+        for filename in listdir(model_file_dir_path):
+            if not filename.startswith('.'):
+                key = filename.split('.')[0]
+                Controller.models[key] = modelManager.load(filename)

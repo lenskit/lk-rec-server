@@ -4,4 +4,4 @@ __pycache__/
 .vscode/
 data.db
 data/
-my_notes.txt
+.DS_Store

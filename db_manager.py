@@ -25,52 +25,58 @@ class DbManager:
     #     conn = pyodbc.connect(connstr)
     #     return conn
 
-    def create_db_structure_with_data(self, movies, ratings, links):
+    def create_db_structure_with_data(self, movies, ratings):
     #     if self.type == "sqlite":
     #         conn = sqlite3.connect(self.connString)
     #         #c = conn.cursor()
     #         movies.to_sql("movies", conn, if_exists="replace")
     #         ratings.to_sql("ratings", conn, if_exists="replace")
-    #         links.to_sql("links", conn, if_exists="replace")
     #     else:
 
             engine = create_engine(self.conn_string)
 
-            # Drop tables
-            sql.execute("DROP TABLE IF EXISTS movies", engine)
-            sql.execute("DROP TABLE IF EXISTS ratings", engine)
+            # # Drop tables
+            # sql.execute("DROP TABLE IF EXISTS movies", engine)
+            # sql.execute("DROP TABLE IF EXISTS ratings", engine)
 
-            # # Create tables
-            sql.execute('''CREATE TABLE movies
-                    (movieId INTEGER, title VARCHAR(200), genres VARCHAR(100))''', engine)
-            sql.execute('''CREATE TABLE ratings
-                    (userId INTEGER, itemId INTEGER, rating FLOAT, timestamp TIMESTAMP)''', engine)
+            # # # Create tables
+            # sql.execute('''CREATE TABLE movies
+            #         (movieId INTEGER, title VARCHAR(200), genres VARCHAR(100))''', engine)
+            # sql.execute('''CREATE TABLE ratings
+            #         (userId INTEGER, itemId INTEGER, rating FLOAT, timestamp DATETIME)''', engine)
            
-            #count = 0
-            for index, row in movies.iterrows():
-                sql.execute("INSERT INTO movies VALUES ({movieId}, '{title}', '{genres}')".format(
-                    movieId=row['movieId'],
-                    title=row['title'].replace("'", r"\'"),
-                    genres=row['genres']), 
-                    engine)
-                # count += 1
-                # if count >= 100:
-                #     break
+            movies.to_sql('movies', con=engine, if_exists='replace', index=False)
+            # #count = 0
+            # for index, row in movies.iterrows():
+            #     sql.execute("INSERT INTO movies VALUES ({movieId}, '{title}', '{genres}')".format(
+            #         movieId=row['movieId'],
+            #         title=row['title'].replace("'", r"\'"),
+            #         genres=row['genres']), 
+            #         engine)
+            #     # count += 1
+            #     # if count >= 100:
+            #     #     break
 
-            # count = 0
-            for index, row in ratings.iterrows():
-                sql.execute("INSERT INTO ratings VALUES ({userId}, {itemId}, {rating}, '{timestamp}')".format(
-                    userId=row['userId'],
-                    itemId=row['movieId'],
-                    rating=row['rating'],
-                    timestamp=datetime.utcfromtimestamp(int(row['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')),
-                    engine)
-                # count += 1
-                # if count >= 100:
-                #     break
+            ratings.to_sql('ratings', con=engine, if_exists='replace', index=False, chunksize=10000)
+            # # count = 0
+            # for index, row in ratings.iterrows():
+            #     sql.execute("INSERT INTO ratings VALUES ({userId}, {itemId}, {rating}, '{timestamp}')".format(
+            #         userId=row['userId'],
+            #         itemId=row['movieId'],
+            #         rating=row['rating'],
+            #         timestamp=datetime.utcfromtimestamp(int(row['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')),
+            #         engine)
+            #     # count += 1
+            #     # if count >= 100:
+            #     #     break
+
+            # Create index
+            sql.execute('''CREATE INDEX idx1 ON ratings (userId, movieId)''', engine)
+            sql.execute('''CREATE INDEX idx1 ON movies (movieId);''', engine)
+
  
     def get_ratings(self):
-        return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(self.conn_string))
+        return sql.read_sql("SELECT userId as user, movieId as item, rating, timestamp FROM ratings;", create_engine(self.conn_string))
 
     def get_movies(self):
         return sql.read_sql("SELECT movieId, title, genres FROM movies;", create_engine(self.conn_string))
