@@ -35,9 +35,9 @@ def recommend_default():
 
 def get_param_value(key):
     # first try to get the value from values (query string or form data), if not, from json data
-    value = request.values.get('user_id', '')
+    value = request.values.get(key, '')
     if value == '':
-        value = request.json.get('user_id', '')
+        value = request.json.get(key, '')
     return value
 
 # Test local urls:
@@ -88,7 +88,7 @@ def upload_model(algo):
     else:
         return jsonify({'result': 'No file sent'})
 
-print('loading models...')
+#print('loading models...')
 #Controller.preload_models()
 
 if __name__ == '__main__':

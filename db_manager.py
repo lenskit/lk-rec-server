@@ -83,3 +83,7 @@ class DbManager:
 
     def get_links(self):
         return sql.read_sql("SELECT movieId, imdbId, tmdbId FROM links;", create_engine(self.conn_string))
+
+    def get_ratings_for_user(self, user_id):
+        return sql.read_sql("SELECT movieId as item, rating FROM ratings WHERE userId = {userId}".format(
+                    userId=user_id), create_engine(self.conn_string))

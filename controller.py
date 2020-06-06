@@ -33,11 +33,15 @@ class Controller:
     def get_recs_using_model(self, user_id, nr_recs, algo, items):
         modelManager = ModelManager()
         lkProxy = LenskitProxy()
+        dbManager = DbManager()
         model = Controller.models.get(algo, None)
         if model == None:
-            print('Model not loaded in memory!!! Model will be load now for this request.')
+            print('\033[1;31;47m Model not loaded in memory!!! Model will be load now for this request. \033[0m')
             model = modelManager.load(algo)
-        return lkProxy.get_recs_from_model(model, user_id, nr_recs,items)
+        ratings = dbManager.get_ratings_for_user(user_id)
+        ratings.set_index('item', inplace=True)
+        print(ratings.head())
+        return lkProxy.get_recs_from_model(model, user_id, nr_recs, items, ratings)
 
     def save_models(self, algos):
         lkProxy = LenskitProxy()

@@ -20,14 +20,14 @@ class LenskitProxy:
                     recs.append({'item': index, 'score': round(value, 3)})
         return recs
 
-    def get_recs_from_model(self, model, user, nr_recs, items):
+    def get_recs_from_model(self, model, user, nr_recs, items, ratings):
         recs = []
         if isinstance(model, Recommender):
             df_recs = model.recommend(user, int(nr_recs))
             for index, row in df_recs.iterrows():
                 recs.append({'item': round(row['item'], 3), 'score': round(row['score'], 3)})
         elif isinstance(model, Predictor):
-            df_recs = model.predict_for_user(user, items)
+            df_recs = model.predict_for_user(user, items, ratings)
             for index, value in df_recs.iteritems():
                 if not math.isnan(value):
                     recs.append({'item': index, 'score': round(value, 3)})
