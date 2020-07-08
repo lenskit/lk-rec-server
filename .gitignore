@@ -5,3 +5,4 @@ __pycache__/
 data.db
 data/
 .DS_Store
+models/

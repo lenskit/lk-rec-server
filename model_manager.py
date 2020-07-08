@@ -4,7 +4,7 @@ import pickle
 class ModelManager:
 
     def __init__(self):
-        self.directory_path = "files/"
+        self.directory_path = "models/"
 
     def store(self, data, file_name):
         # Its important to use binary mode
