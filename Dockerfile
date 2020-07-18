@@ -1,7 +1,8 @@
-FROM ubuntu:18.04
+# FROM ubuntu:18.04
 
-RUN apt-get update -y && \
-    apt-get install -y python3.6-dev
+# RUN apt-get update -y && \
+#     apt-get install -y python3.6-dev
+FROM python:3.8-buster
 
 # We copy just the requirements.txt first to leverage Docker cache
 COPY ./requirements.txt /app/requirements.txt
@@ -14,6 +15,6 @@ COPY . /app
 
 EXPOSE 5000
 
-ENTRYPOINT ["python"]
-
-CMD ["app.py"]
+# ENTRYPOINT ["python"]
+# CMD ["app.py"]
+CMD ["python", "app.py"]

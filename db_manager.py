@@ -10,7 +10,7 @@ class DbManager:
     def __init__(self):
         reader = ConfigReader()
         db_connection = reader.get_value("db_connection")        
-        self.conn_string = '{db_engine}+{connector}://{user}:{password}@{server}/{database}'.format(
+        self.conn_string = '{db_engine}{connector}://{user}:{password}@{server}/{database}'.format(
             db_engine=db_connection['db_engine'],
             connector=db_connection['connector'],
             user=db_connection['user'],
@@ -19,5 +19,5 @@ class DbManager:
             database=db_connection['database'])
 
     def get_ratings_for_user(self, user_id):
-        return sql.read_sql("SELECT movieId as item, rating FROM ratings WHERE userId = {userId}".format(
+        return sql.read_sql("SELECT itemId as item, rating FROM ratings WHERE userId = {userId}".format(
                     userId=user_id), create_engine(self.conn_string))
