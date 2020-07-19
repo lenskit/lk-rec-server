@@ -27,6 +27,13 @@ def recommendations_response(user_id, num_recs):
     response = requests.get(BASE_URL_API + right_url, params=params)
     return response
 
+@given('Given the default recommendation endpoint is called with <user_id> and <num_recs>')
+def recommendations_response(user_id, num_recs):
+    params = {'user_id': user_id, 'num_recs': num_recs, 'format': 'json'}
+    right_url = 'recommendations'
+    response = requests.get(BASE_URL_API + right_url, params=params)
+    return response
+
 # Then Steps
 @then('the response returns a list of recommendations')
 def get_response_list_recs(recommendations_response):
@@ -42,3 +49,4 @@ def get_response_num_items(recommendations_response, num_recs):
 @then(parsers.parse('the response status code is "{code:d}"'))
 def ddg_response_code(recommendations_response, code):
     assert recommendations_response.status_code == code
+

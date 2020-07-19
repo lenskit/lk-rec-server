@@ -10,8 +10,6 @@ Feature: recommendations
     Then the response status code is "200"
     And the response returns a list of recommendations 
     And the response has <num_recs> items
-
-
     Examples:
       | user_id  |  num_recs  |
       | 1        |  5         |
@@ -22,12 +20,18 @@ Feature: recommendations
     Given the recommend API is called with <user_id> and <num_recs>
     Then the response status code is "200"
     And the response returns a list of recommendations
-
-        Examples:
+    Examples:
       | user_id   |  num_recs  |
       | -1        |  5         |
       | -2        |  10        |
       | -3        |  15        |
 
-  Scenario Outline: Recommend for non-existing items
-    
+  Scenario Outline: Get recommendations from the default algorithm
+    Given the default recommendation endpoint is called with <user_id> and <num_recs>
+    Then the response status code is "200"
+    And the response returns a list of recommendations
+    Examples:
+      | user_id  |  num_recs  |
+      | 1        |  5         |
+      | 2        |  10        |
+      | 3        |  15        |
