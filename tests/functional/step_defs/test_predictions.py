@@ -26,3 +26,10 @@ def predictions_response(user_id, items):
     right_url = 'algorithms/bias/predictions'
     response = requests.get(BASE_URL_API + right_url, params=params)
     return response
+
+# Then Steps
+@then('the response returns a list of recommendations')
+def get_response_list_recs(recommendations_response):
+    recs = recommendations_response.json()['recommendations']
+    assert len(recs) > 0
+    assert recs[0]['score'] > 0
