@@ -2,7 +2,7 @@ Feature: recommendations
   Get recommendations for a user
 
   Background:
-    Given a trained ALS recommender model
+    Given a trained recommender model
     And a running recommendation server
 
   Scenario Outline: Recommend items for an existing user

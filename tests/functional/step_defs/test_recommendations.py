@@ -13,7 +13,7 @@ def is_server_running():
     response = requests.get(BASE_URL_API)
     assert response.status_code == 404
 
-@given('a trained ALS recommender model')
+@given('a trained recommender model')
 def get_trained_als_model():
     right_url = 'algorithms/popular/info'
     response = requests.get(BASE_URL_API + right_url)
@@ -27,7 +27,7 @@ def recommendations_response(user_id, num_recs):
     response = requests.get(BASE_URL_API + right_url, params=params)
     return response
 
-@given('Given the default recommendation endpoint is called with <user_id> and <num_recs>')
+@given('the default recommendation endpoint is called with <user_id> and <num_recs>')
 def recommendations_response(user_id, num_recs):
     params = {'user_id': user_id, 'num_recs': num_recs, 'format': 'json'}
     right_url = 'recommendations'
