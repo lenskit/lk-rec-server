@@ -1,38 +1,60 @@
+import pytest
 import requests
 
 from pytest_bdd import scenarios, given, then, parsers
+from requests.exceptions import ConnectionError
 
-BASE_URL_API = 'http://127.0.0.1:5000/'
+#BASE_URL_API = 'http://127.0.0.1:5000/'
+
+def is_responsive(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return True
+    except ConnectionError:
+        return False
+
+@pytest.fixture(scope="session")
+def http_service(docker_ip, docker_services):
+    """Ensure that HTTP service is up and responsive."""
+
+    # `port_for` takes a container port and returns the corresponding host port
+    port = docker_services.port_for("rec-server", 5000)
+    url = "http://{}:{}/".format(docker_ip, port)
+    docker_services.wait_until_responsive(
+        timeout=30.0, pause=0.1, check=lambda: is_responsive(url)
+    )
+    return url
 
 # Scenarios
 scenarios('../features/recommendations.feature', example_converters=dict(user_id=int, num_recs=int))
 
 # Given Steps
 @given('a running recommendation server')
-def is_server_running():
-    response = requests.get(BASE_URL_API)
+def is_server_running(http_service):
+    response = requests.get(http_service)
     assert response.status_code == 404
 
 @given('a trained recommender model')
-def get_trained_als_model():
+def get_trained_als_model(http_service):
     right_url = 'algorithms/popular/info'
-    response = requests.get(BASE_URL_API + right_url)
+    response = requests.get(http_service + right_url)
     print(response)
     assert len(response.json()['model']) > 0
 
 @given('the recommend API is called with <user_id> and <num_recs>')
-def recommendations_response(user_id, num_recs):
+def recommendations_response(user_id, num_recs, http_service):
     params = {'user_id': user_id, 'num_recs': num_recs, 'format': 'json'}
     right_url = 'algorithms/popular/recommendations'
-    response = requests.get(BASE_URL_API + right_url, params=params)
+    response = requests.get(http_service + right_url, params=params)
     return response
 
-@given('the default recommendation endpoint is called with <user_id> and <num_recs>')
-def recommendations_response(user_id, num_recs):
-    params = {'user_id': user_id, 'num_recs': num_recs, 'format': 'json'}
-    right_url = 'recommendations'
-    response = requests.get(BASE_URL_API + right_url, params=params)
-    return response
+# @given('the default recommendation endpoint is called with <user_id> and <num_recs>')
+# def recommendations_response(user_id, num_recs, http_service):
+#     params = {'user_id': user_id, 'num_recs': num_recs, 'format': 'json'}
+#     right_url = 'recommendations'
+#     response = requests.get(http_service + right_url, params=params)
+#     return response
 
 # Then Steps
 @then('the response returns a list of recommendations')

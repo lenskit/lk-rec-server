@@ -1,7 +1,10 @@
 version: '3'
 services:
   rec-server:
-    image: rec-server
+    build:
+      context: .
+      dockerfile: ../Dockerfile    
+    #image: rec-server
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     ports:
@@ -11,6 +14,9 @@ services:
     volumes:
       - .:/app
   postgres-db:
-    image: "postgres-db"
+    build:
+      context: .
+      dockerfile: ../test_db/Dockerfile    
+    #image: "postgres-db"
     environment:
        POSTGRES_PASSWORD: postgres

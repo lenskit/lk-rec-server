@@ -3,7 +3,7 @@ FROM postgres
 ENV POSTGRES_PASSWORD postgres 
 ENV POSTGRES_DB db 
 
-COPY *.sql /docker-entrypoint-initdb.d/
+#COPY ./setup.sql /docker-entrypoint-initdb.d/
 
 ADD setup.sql /docker-entrypoint-initdb.d
 
