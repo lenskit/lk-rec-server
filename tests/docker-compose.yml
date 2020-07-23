@@ -2,21 +2,21 @@ version: '3'
 services:
   rec-server:
     build:
-      context: .
-      dockerfile: ../Dockerfile    
+      context: ../
+      dockerfile: Dockerfile    
     #image: rec-server
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
+    # stdin_open: true # docker run -i
+    # tty: true        # docker run -t
     ports:
       - "5000:5000"
     depends_on:
        - postgres-db
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
   postgres-db:
     build:
-      context: .
-      dockerfile: ../test_db/Dockerfile    
+      context: ../test_db/
+      dockerfile: Dockerfile    
     #image: "postgres-db"
     environment:
        POSTGRES_PASSWORD: postgres
