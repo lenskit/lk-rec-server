@@ -6,7 +6,7 @@
         "connector": "+psycopg2",
         "user": "postgres",
         "password": "postgres",
-        "server": "postgres-db",
+        "server": "postgresdb",
         "database": "db"
     }
 }

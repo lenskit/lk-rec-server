@@ -1,19 +1,19 @@
 version: '3'
 services:
-  rec-server:
+  recserver:
     build:
       context: ../
-      dockerfile: Dockerfile    
-    #image: rec-server
+      dockerfile: Dockerfile
+    # image: rec-server
     # stdin_open: true # docker run -i
     # tty: true        # docker run -t
     ports:
       - "5000:5000"
     depends_on:
-       - postgres-db
+       - postgresdb
     # volumes:
     #   - .:/app
-  postgres-db:
+  postgresdb:
     build:
       context: ../test_db/
       dockerfile: Dockerfile    

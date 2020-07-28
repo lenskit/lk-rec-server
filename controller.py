@@ -29,7 +29,7 @@ class Controller:
         return lkProxy.get_recs_from_model(model, user_id, nr_recs, items, ratings)
     
     def get_model_info(self, algo):
-        model_file_dir_path = "files/" + algo + '.pickle'
+        model_file_dir_path = "models/" + algo + '.pickle'
         creation_date = ""
         updated_date = ""
         size = 0
@@ -40,12 +40,12 @@ class Controller:
         return {"creation_date": creation_date + " UTC", "updated_date": updated_date + " UTC", "size": str(size) + " KB"}
 
     def upload_model(self, algo, file):
-        file_name = path.join('files/' + algo + '.pickle')
+        file_name = path.join('models/' + algo + '.pickle')
         file.save(file_name)
 
     @staticmethod
     def preload_models():
-        model_file_dir_path = "files/"
+        model_file_dir_path = "models/"
         modelManager = ModelManager()
         for filename in listdir(model_file_dir_path):
             if not filename.startswith('.'):

@@ -1,8 +1,9 @@
 venv/
-files/
+models/
 __pycache__/
 .vscode/
 data.db
 data/
 .DS_Store
 models/
+test_db/files/

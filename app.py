@@ -4,11 +4,14 @@ from config_reader import ConfigReader
 
 app = Flask(__name__)
 
+@app.route('/status', methods=['GET'])
+def status():
+    return jsonify({"status": "Ok"})
+
 @app.route('/preloadmodels', methods=['GET'])
 def preload_models():
-    #ctrl = Controller()
     Controller.preload_models()
-    return jsonify({"result": 'ok'})
+    return jsonify({"result": 'Ok'})
 
 # Default algo path:
 # 	/recommendations
@@ -69,7 +72,7 @@ def upload_model(algo):
     if len(keys) > 0:
         file = request.files.get(keys[0], None)
         ctrl.upload_model(algo, file) # upload the first entry file
-        return jsonify({'result': 'ok'})
+        return jsonify({'result': 'Ok'})
     else:
         return jsonify({'result': 'No file sent'})
 
