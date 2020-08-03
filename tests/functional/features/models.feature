@@ -16,7 +16,7 @@ Feature: models
       | biasedmf    |
 
   Scenario Outline: Get model info for a non-existing model file
-    Given not a trained recommender model for <algo>
+    Given a trained recommender model for <algo>
     Then the response status code is "200"
     And the response returns empty information for the model
     Examples:
@@ -26,25 +26,12 @@ Feature: models
       | topn10      |
 
   Scenario Outline: Upload a new model
-    Given not a trained recommender model for <algo>
-    Then upload model for <algo>
-    Then the response status code is "200"
-    And the response returns the model creation_date and size
+    #Given a trained recommender model for <algo>
+    Given upload model for <algo>
+    Then the response status code is "200" and "Ok"
     Examples:
       | algo        |  
       | popular     |
       | bias        |
       | topn        |
-      | biasedmf    |
-
-  Scenario Outline: Upload an existing model
-    Given a trained recommender model for <algo>
-    Then upload model for <algo>
-    Then the response status code is "200"
-    And the response returns the model creation_date and size
-    Examples:
-      | algo        |  
-      | popular     |
-      | bias        |
-      | topn        |
-      | biasedmf    |
+      | implicitmf    |

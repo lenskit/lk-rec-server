@@ -30,14 +30,19 @@ class Controller:
     
     def get_model_info(self, algo):
         model_file_dir_path = "models/" + algo + '.pickle'
-        creation_date = ""
-        updated_date = ""
+        creation_date = None
+        updated_date = None
         size = 0
         if path.exists(model_file_dir_path):
             creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S') 
             updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S')
             size = path.getsize(model_file_dir_path) / 1000
-        return {"creation_date": creation_date + " UTC", "updated_date": updated_date + " UTC", "size": str(size) + " KB"}
+            # dates are in UTC format and size is in KB
+            return {"creation_date": creation_date, "updated_date": updated_date, "size": size }
+        else:
+            return {}
+        
+       
 
     def upload_model(self, algo, file):
         file_name = path.join('models/' + algo + '.pickle')
