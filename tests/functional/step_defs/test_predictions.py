@@ -19,9 +19,8 @@ def http_service(docker_ip, docker_services):
     # `port_for` takes a container port and returns the corresponding host port
     port = docker_services.port_for("recserver", 5000)
     url = "http://{}:{}/".format(docker_ip, port)
-    print(url)
     docker_services.wait_until_responsive(
-        timeout=30.0, pause=0.1, check=lambda: is_responsive(url)
+        timeout=60.0, pause=0.1, check=lambda: is_responsive(url)
     )
     return url
 
@@ -31,14 +30,13 @@ scenarios('../features/predictions.feature', example_converters=dict(user_id=int
 # Given Steps
 @given('a running recommendation server')
 def is_server_running(http_service):
-    response = requests.get(http_service + "status")
+    response = requests.get(http_service + "status")    
     assert response.status_code == 200
 
 @given('a trained recommender model')
 def get_trained_als_model(http_service):
     right_url = 'algorithms/biasedmf/info'
     response = requests.get(http_service + right_url)
-    print(response)
     assert len(response.json()['model']) > 0
 
 @given('the predict API is called with <user_id> and <items>')
@@ -62,4 +60,5 @@ def get_response_empty_list_recs(predictions_response):
 
 @then(parsers.parse('the response status code is "{code:d}"'))
 def ddg_response_code(predictions_response, code):
+    print(predictions_response.text)
     assert predictions_response.status_code == code    

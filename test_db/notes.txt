@@ -10,6 +10,8 @@ docker run --name postgres-db-container -p 5555:5432 -v /Users/carlos/BSU/Resear
 # docker run --name postgres-db-container -p 5555:5432 postgres-db
 # docker run -d --name postgres-db-container -p 5555:5432 postgres-db
 
+docker run --name dbcontainer -p 5432:5432 pytest4250_postgresdb
+
 docker stop postgres-db-container
 docker container start postgres-db-container
 

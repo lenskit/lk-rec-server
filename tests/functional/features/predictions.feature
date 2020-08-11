@@ -19,12 +19,12 @@ Feature: predictions
   Scenario Outline: Get items predictions for a new user
     Given the predict API is called with <user_id> and <items>
     Then the response status code is "200"
-    And the response returns a list of predictions
+    And the response returns an empty list
     Examples:
       | user_id   |  items      |
-      | 1        |  1,10       |
-      | 2        |  2,20       |
-      | 3        |  3,30       |
+      | -1        |  1,10       |
+      | -2        |  2,20       |
+      | -3        |  3,30       |
     
   Scenario Outline: Get items predictions for non existing items
     Given the predict API is called with <user_id> and <items>

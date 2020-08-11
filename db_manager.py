@@ -5,6 +5,7 @@ import urllib
 from config_reader import ConfigReader
 from pandas.io import sql
 from datetime import datetime
+import time
 
 class DbManager:
     def __init__(self):
@@ -17,7 +18,20 @@ class DbManager:
             password=db_connection['password'],
             server=db_connection['server'],
             database=db_connection['database'])
+        self.count = 0
 
     def get_ratings_for_user(self, user_id):
-        return sql.read_sql("SELECT itemId as item, rating FROM ratings WHERE userId = {userId}".format(
-                    userId=user_id), create_engine(self.conn_string))
+        return self.try_connect_db("SELECT itemId as item, rating FROM ratings WHERE userId = {userId}".format(
+                    userId=user_id))
+
+    def try_connect_db(self, sql_statement):
+        try:
+            return sql.read_sql(sql_statement, create_engine(self.conn_string))
+        except:
+            self.count += 1
+            print("Trying to call the database again. Attempt number: " + str(self.count))
+            time.sleep(3)
+            if self.count > 5:
+                raise
+            else:
+                return self.try_connect_db(sql_statement)

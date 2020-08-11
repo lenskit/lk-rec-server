@@ -1,5 +1,12 @@
 version: '3'
 services:
+  postgresdb:
+    build:
+      context: ../test_db/
+      dockerfile: Dockerfile
+    #image: "postgres-db"
+    environment:
+       POSTGRES_PASSWORD: postgres
   recserver:
     build:
       context: ../
@@ -13,10 +20,3 @@ services:
        - postgresdb
     # volumes:
     #   - .:/app
-  postgresdb:
-    build:
-      context: ../test_db/
-      dockerfile: Dockerfile    
-    #image: "postgres-db"
-    environment:
-       POSTGRES_PASSWORD: postgres
