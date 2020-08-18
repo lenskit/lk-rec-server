@@ -6,7 +6,7 @@ class ModelManager:
 
     def __init__(self):
         self.directory_path = "models/"
-        self.extension = ".pbk" #".pickle"
+        self.extension = ".bpk" #".pickle"
 
     def store(self, data, file_name):
         # Its important to use binary mode
