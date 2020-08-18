@@ -19,10 +19,11 @@ class Controller:
         modelManager = ModelManager()
         lkProxy = LenskitProxy()
         dbManager = DbManager()
-        model = Controller.models.get(algo, None)
-        if model == None:
-            print('\033[1;31;47m Model not loaded in memory!!! Model will be load now for this request. \033[0m')
-            model = modelManager.load(algo)
+        # model = Controller.models.get(algo, None)
+        # if model == None:
+        #     print('\033[1;31;47m Model not loaded in memory!!! Model will be load now for this request. \033[0m')
+        #     model = modelManager.load(algo)
+        model = modelManager.load_for_shared_mem(algo)            
         ratings = dbManager.get_ratings_for_user(user_id)
         ratings.set_index('item', inplace=True)
         #print(ratings.head())
@@ -55,4 +56,5 @@ class Controller:
         for filename in listdir(model_file_dir_path):
             if not filename.startswith('.'):
                 key = filename.split('.')[0]
-                Controller.models[key] = modelManager.load(filename)
+                #Controller.models[key] = modelManager.load(filename)
+                modelManager.load_for_shared_mem(filename)
