@@ -37,7 +37,7 @@ def recommend(algo):
     num_recs = get_param_value('num_recs')
 
     ctrl = Controller()
-    recs = ctrl.get_recs_using_model(user_id, num_recs, algo, None)
+    recs = ctrl.get_results_from_model(user_id, num_recs, algo, None)
     return jsonify({'recommendations': recs})
  
  # Test local urls:
@@ -57,7 +57,7 @@ def predict(algo):
     # TODO: Add these two parameters to use in the algos
     # use exclusion_list and candidate_list
 
-    recs = ctrl.get_recs_using_model(user_id, None, algo, items)
+    recs = ctrl.get_results_from_model(user_id, None, algo, items)
     return jsonify({'predictions': recs})
 
 @app.route('/algorithms/<algo>/info', methods=['GET'])
@@ -76,6 +76,14 @@ def upload_model(algo):
     else:
         return jsonify({'result': 'No file sent'})
 
+# Save all the algo models to disk
+# http://127.0.0.1:5000/save_models/popular,bias,topn,itemitem,useruser,biasedmf,implicitmf,funksvd
+@app.route('/save_models/<algos>', methods=['GET'])
+def save_models(algos):
+    ctrl = Controller()
+    ctrl.save_models(algos)
+    return jsonify({"result": 'ok'})
+    
 # print('loading models...')
 # Controller.preload_models()
 

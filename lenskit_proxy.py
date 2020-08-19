@@ -20,7 +20,7 @@ class LenskitProxy:
     #                 recs.append({'item': index, 'score': round(value, 3)})
     #     return recs
 
-    def get_recs_from_model(self, model, user, nr_recs, items, ratings):
+    def get_results_from_model(self, model, user, nr_recs, items, ratings):
         recs = []
         if isinstance(model, Recommender):
             df_recs = model.recommend(user, int(nr_recs))
@@ -33,20 +33,25 @@ class LenskitProxy:
                     recs.append({'item': index, 'score': round(value, 3)})
         return recs
 
-    # def get_algo_class(self, algo):
-    #     if algo == 'popular':
-    #         return basic.Popular()
-    #     elif algo == 'bias':
-    #         return basic.Bias(users=False)
-    #     elif algo == 'topn':
-    #         return basic.TopN(basic.Bias())
-    #     elif algo == 'itemitem':
-    #         return iknn.ItemItem(nnbrs=-1)
-    #     elif algo == 'useruser':
-    #         return uknn.UserUser(nnbrs=5)
-    #     elif algo == 'biasedmf':
-    #         return als.BiasedMF(50, iterations=10)
-    #     elif algo == 'implicitmf':
-    #         return als.ImplicitMF(20, iterations=10)
-    #     elif algo == 'funksvd':
-    #         return svd.FunkSVD(20, iterations=20)
+    def get_algo_class(self, algo):
+        if algo == 'popular':
+            return basic.Popular()
+        elif algo == 'bias':
+            return basic.Bias(users=False)
+        elif algo == 'topn':
+            return basic.TopN(basic.Bias())
+        elif algo == 'itemitem':
+            return iknn.ItemItem(nnbrs=-1)
+        elif algo == 'useruser':
+            return uknn.UserUser(nnbrs=5)
+        elif algo == 'biasedmf':
+            return als.BiasedMF(50, iterations=10)
+        elif algo == 'implicitmf':
+            return als.ImplicitMF(20, iterations=10)
+        elif algo == 'funksvd':
+            return svd.FunkSVD(20, iterations=20)
+
+    def create_model(self, algo, ratings):
+        algo_class = self.get_algo_class(algo)
+        algo_class.fit(ratings)
+        return algo_class

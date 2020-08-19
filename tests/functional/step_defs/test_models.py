@@ -51,7 +51,7 @@ def get_trained_model_response(http_service, algo):
 @given('upload model for <algo>')
 def get_upload_model_response(algo, http_service):
     right_url = f'algorithms/{algo}/modelfile'
-    model_name = algo + ".pickle"
+    model_name = algo + ".bpk"
     file_path = "tests/functional/test_files/" + model_name
     files = {
         'file': open(file_path, 'rb')
