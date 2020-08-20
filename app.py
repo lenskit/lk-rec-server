@@ -57,8 +57,8 @@ def predict(algo):
     # TODO: Add these two parameters to use in the algos
     # use exclusion_list and candidate_list
 
-    recs = ctrl.get_results_from_model(user_id, None, algo, items)
-    return jsonify({'predictions': recs})
+    preds = ctrl.get_results_from_model(user_id, None, algo, items)
+    return jsonify({'predictions': preds})
 
 @app.route('/algorithms/<algo>/info', methods=['GET'])
 def get_model_info(algo):
