@@ -22,7 +22,7 @@ Curl Testing API
 Upload the model file:
 curl -X PUT http://127.0.0.1:5000/algorithms/bias/modelfile -F file=@"model.pickle"
 
-curl -X PUT http://127.0.0.1:5000/algorithms/itemitem/modelfile -F file=@"itemitem.pickle"
+curl -X PUT http://127.0.0.1:5000/algorithms/bias/modelfile -F file=@"bias.bpk"
 
 curl --header "Content-Type: application/json" \
   --request POST \

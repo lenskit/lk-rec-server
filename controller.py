@@ -1,5 +1,7 @@
+import os
 from os import path, listdir
 from datetime import datetime
+from pathlib import Path
 from lenskit_proxy import LenskitProxy
 from db_manager import DbManager
 from model_manager import ModelManager
@@ -37,12 +39,15 @@ class Controller:
         else:
             return {}
         
-       
-
     def upload_model(self, algo, file):
-        file_name = path.join('models/' + algo + '.bpk')
-        file.save(file_name)
-
+        # save the model file in a temp file
+        ts = datetime.now().timestamp()
+        temp_file_name = Path(f'models/{algo}_{ts}.bpk')
+        file.save(temp_file_name)
+        # rename the temp file name
+        file_name = Path(f'models/{algo}.bpk')
+        os.rename(temp_file_name, file_name)
+    
     @staticmethod
     def preload_models():
         model_file_dir_path = "models/"
