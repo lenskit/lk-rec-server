@@ -36,5 +36,5 @@ class DbManager:
             else:
                 return self.try_connect_db(sql_statement)
 
-    def get_ratings(self):
-        return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(self.conn_string))
+    # def get_ratings(self):
+    #     return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(self.conn_string))

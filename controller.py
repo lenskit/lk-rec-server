@@ -58,11 +58,11 @@ class Controller:
                 Controller.models[key] = modelManager.load_for_shared_mem(filename)
                 # modelManager.load_for_shared_mem(filename)
 
-    def save_models(self, algos):
-        lkProxy = LenskitProxy()
-        dbManager = DbManager()
-        ratings = dbManager.get_ratings()
-        modelManager = ModelManager()
-        for algo in algos.split(','):
-            model = lkProxy.create_model(algo, ratings)
-            modelManager.store(model, algo)
+    # def save_models(self, algos):
+    #     lkProxy = LenskitProxy()
+    #     dbManager = DbManager()
+    #     ratings = dbManager.get_ratings()
+    #     modelManager = ModelManager()
+    #     for algo in algos.split(','):
+    #         model = lkProxy.create_model(algo, ratings)
+    #         modelManager.store(model, algo)
