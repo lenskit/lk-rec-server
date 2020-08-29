@@ -65,3 +65,7 @@ Retry Wait =
 
 [MySQL ODBC 8.0 ANSI Driver]
 Driver = /usr/local/mysql-connector-odbc-8.0.19-macos10.15-x86-64bit/lib/libmyodbc8a.so
+
+
+Build documentation:
+  sphinx-build doc build/doc

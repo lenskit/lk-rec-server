@@ -4,6 +4,13 @@ from config_reader import ConfigReader
 
 app = Flask(__name__)
 
+def get_param_value(key):
+    """First try to get the value from values (query string or form data), if not, from json data. """
+    value = request.values.get(key, '')
+    if value == '':
+        value = request.json.get(key, '')
+    return value
+
 @app.route('/status', methods=['GET'])
 def status():
     """
@@ -36,13 +43,6 @@ def recommend_default():
     reader = ConfigReader()
     algo = reader.get_value("default_algorithm")
     return recommend(algo)
-
-def get_param_value(key):
-    """First try to get the value from values (query string or form data), if not, from json data. """
-    value = request.values.get(key, '')
-    if value == '':
-        value = request.json.get(key, '')
-    return value
 
 # Test local urls:
 # http://127.0.0.1:8000/algorithms/popular/recommendations?user_id=2038&num_recs=10

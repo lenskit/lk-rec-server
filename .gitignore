@@ -8,3 +8,4 @@ data/
 models/
 test_db/files/
 tests/performance/.ipynb_checkpoints/
+build/

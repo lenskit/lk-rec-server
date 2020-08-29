@@ -48,7 +48,7 @@ extensions = [
     # 'sphinx.ext.intersphinx',
     # 'sphinx.ext.mathjax',
     'sphinx_rtd_theme',
-    'sphinxcontrib-httpdomain'
+    'sphinxcontrib.httpdomain'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
