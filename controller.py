@@ -2,28 +2,25 @@ import os
 from os import path, listdir
 from datetime import datetime
 from pathlib import Path
-from lenskit_proxy import LenskitProxy
-from db_manager import DbManager
-from model_manager import ModelManager
+import lenskit_proxy
+import db_manager
+import model_manager
 
 class Controller:
     models = {}
     
-    # Get recommendations using a saved model
+    # Get recommendations using a saved model    
     def get_results_from_model(self, user_id, nr_recs, algo, items):
-        modelManager = ModelManager()
-        lkProxy = LenskitProxy()
-        dbManager = DbManager()
-        ratings = dbManager.get_ratings_for_user(user_id)
+        ratings = db_manager.get_ratings_for_user(user_id)
         ratings.set_index('item', inplace=True)
         ratings = ratings.iloc[:, 0]
         model = Controller.models.get(algo, None)
         if model == None:
             print('\033[1;31;47m Model not loaded in memory!!! Model will be load now for this request. \033[0m')
-            model = modelManager.load_for_shared_mem(algo)      
+            model = model_manager.load_for_shared_mem(algo)
             Controller.models[algo] = model
         
-        return lkProxy.get_results_from_model(model, user_id, nr_recs, items, ratings)
+        return lenskit_proxy.get_results_from_model(model, user_id, nr_recs, items, ratings)
     
     def get_model_info(self, algo):
         model_file_dir_path = "models/" + algo + '.bpk'
@@ -51,18 +48,15 @@ class Controller:
     @staticmethod
     def preload_models():
         model_file_dir_path = "models/"
-        modelManager = ModelManager()
         for filename in listdir(model_file_dir_path):
             if not filename.startswith('.'):
                 key = filename.split('.')[0]
-                Controller.models[key] = modelManager.load_for_shared_mem(filename)
-                # modelManager.load_for_shared_mem(filename)
+                Controller.models[key] = model_manager.load_for_shared_mem(filename)
 
     # def save_models(self, algos):
     #     lkProxy = LenskitProxy()
     #     dbManager = DbManager()
     #     ratings = dbManager.get_ratings()
-    #     modelManager = ModelManager()
     #     for algo in algos.split(','):
     #         model = lkProxy.create_model(algo, ratings)
-    #         modelManager.store(model, algo)
+    #         model_manager.store(model, algo)
