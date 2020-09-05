@@ -8,6 +8,7 @@ from lenskit.algorithms import basic, als, Predictor, Recommender
 import lenskit.algorithms.item_knn as iknn
 import lenskit.algorithms.user_knn as uknn
 import lenskit.algorithms.funksvd as svd
+from lenskit.algorithms.implicit import BPR
 from pathlib import Path
 from binpickle import dump
 from lenskit.sharing import sharing_mode
@@ -51,16 +52,41 @@ def get_algo_class(algo):
     elif algo == 'funksvd':
         return svd.FunkSVD(20, iterations=20)
 
+def get_topn_algo_class(algo):
+    if algo == 'popular':
+        return basic.Popular()
+    elif algo == 'bias':
+        return basic.TopN(basic.Bias())
+    # elif algo == 'topn':
+    #     return basic.TopN(basic.Bias())
+    elif algo == 'itemitem':
+        return basic.TopN(iknn.ItemItem(nnbrs=-1, center=False, aggregate='sum'))
+    elif algo == 'useruser':
+        return basic.TopN(uknn.UserUser(nnbrs=5, center=False, aggregate='sum'))
+    elif algo == 'biasedmf':
+        return basic.TopN(als.BiasedMF(50, iterations=10))
+    elif algo == 'implicitmf':
+        return basic.TopN(als.ImplicitMF(20, iterations=10))
+    elif algo == 'funksvd':
+        return basic.TopN(svd.FunkSVD(20, iterations=20))
+    elif algo == 'bpr':
+        return basic.TopN(BPR(25))
+
 def create_model(algo, ratings):
-    algo_class = get_algo_class(algo)
-    algo_class.fit(ratings)
-    return algo_class
+    algo_class = get_topn_algo_class(algo)
+    if algo_class != None:
+        algo_class.fit(ratings)
+        return algo_class
 
 def store(data, file_name, sharingmode=True):
-    full_file_name = Path(get_value("models_folder_path")) / file_name
+    models_folder_path = get_value("models_folder_path")
+    full_file_name = Path(models_folder_path) / file_name
 
     if full_file_name.exists():
         os.remove(full_file_name)
+
+    if not os.path.exists(models_folder_path):
+        os.makedirs(models_folder_path)
 
     if sharingmode:
         with sharing_mode():
@@ -80,11 +106,17 @@ def save_models(algos, from_data_files=True):
         algo = algo.strip()
         print(f'Creating model for {algo}')
         model = create_model(algo, ratings)
-        store(model, algo + ".bpk", False)
-        print(f'Model {algo} saved successfully')
+        if model != None:
+            store(model, algo + ".bpk", False)
+            print(f'Model {algo} saved successfully')
+        else:
+            print(f'Algorithm {algo} not found')
 
 if __name__ == "__main__":
     from_data_files = True
     if len(sys.argv) > 2:
         from_data_files = not (sys.argv[2].lower() == 'false')
     save_models(sys.argv[1], from_data_files)
+
+# python train_save_model.py algos from_data_files
+# python train_save_model.py popular,bias,itemitem,useruser,biasedmf,implicitmf,funksvd,bpr False

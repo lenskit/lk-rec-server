@@ -19,10 +19,11 @@ Endpoints:
 
     .. sourcecode:: none
 
-        POST /recommendations
-        Data: { "user_id" : 1, "num_recs" : 5 }
+        POST /recommendations        
         Host: example.com
-        Accept: application/json, text/javascript        
+        Accept: application/json, text/javascript
+
+        Data: { "user_id" : 1, "num_recs" : 5 }
 
     **Example response**:
 
@@ -31,6 +32,7 @@ Endpoints:
         HTTP/1.1 200 OK
         Vary: Accept
         Content-Type: application/json
+
         {
         "recommendations": [
                 {
@@ -55,6 +57,7 @@ Endpoints:
                 }
             ]
         }
+
     
     :query int user_id: user id to get recommendations for
     :query int num_recs: number of recommendations to return
@@ -77,9 +80,10 @@ Endpoints:
     .. sourcecode:: none
 
         POST /algorithms/popular/recommendations
-        Data: { "user_id" : 1, "num_recs" : 5 }
         Host: example.com
-        Accept: application/json, text/javascript        
+        Accept: application/json, text/javascript
+
+        Data: { "user_id" : 1, "num_recs" : 5 }
 
     **Example response**:
 
@@ -88,6 +92,7 @@ Endpoints:
         HTTP/1.1 200 OK
         Vary: Accept
         Content-Type: application/json
+
         {
         "recommendations": [
                 {
@@ -112,6 +117,7 @@ Endpoints:
                 }
             ]
         }
+
     
     :query int user_id: user id to get recommendations for
     :query int num_recs: number of recommendations to return
@@ -134,9 +140,10 @@ Endpoints:
     .. sourcecode:: none
 
         POST /algorithms/bias/predictions
-        Data: { "user_id" : 1, "items" : 5,102,203,304,400 }
         Host: example.com
-        Accept: application/json, text/javascript        
+        Accept: application/json, text/javascript
+
+        Data: { "user_id" : 1, "items" : 5,102,203,304,400 }
 
     **Example response**:
 
@@ -145,6 +152,7 @@ Endpoints:
         HTTP/1.1 200 OK
         Vary: Accept
         Content-Type: application/json
+
         {
         "predictions": [
                 {
@@ -169,6 +177,7 @@ Endpoints:
                 }
             ]
         }
+
     
     :query int user_id: user id to get predictions for
     :query list_of_ints items: items to get predictions for
@@ -195,6 +204,7 @@ Endpoints:
         HTTP/1.1 200 OK
         Vary: Accept
         Content-Type: application/json
+
         {
             "model": {
                 "creation_date": "2020-08-28 18:38:42", 
@@ -202,6 +212,7 @@ Endpoints:
                 "updated_date": "2020-08-21 18:32:55"
             }
         }
+
 
 .. http:put:: /algorithms/(string:algo)/modelfile
 
@@ -211,7 +222,7 @@ Endpoints:
 
     .. sourcecode:: none
 
-        GET /algorithms/popular/info
+        GET /algorithms/popular/modelfile
         Host: example.com
         Accept: application/json, text/javascript   
 
@@ -222,4 +233,5 @@ Endpoints:
         HTTP/1.1 200 OK
         Vary: Accept
         Content-Type: application/json
+
         { 'result' : 200 }
