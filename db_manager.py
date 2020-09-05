@@ -31,7 +31,7 @@ def try_connect_db(sql_statement, count):
         if count > 5:
             raise
         else:
-            return try_connect_db(sql_statement)
+            return try_connect_db(sql_statement, count)
 
     # def get_ratings(self):
     #     return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(conn_string))

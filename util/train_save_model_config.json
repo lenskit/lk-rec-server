@@ -1,0 +1,14 @@
+{
+    "data_folder_path": "data/",
+    "models_folder_path": "models/",
+    "ratings_file_name": "ratings.csv",
+    "db_connection":
+    {
+        "db_engine": "mysql",
+        "connector": "+mysqlconnector",
+        "user": "root",
+        "password": "root",
+        "server": "localhost",
+        "database": "db"
+    }
+}

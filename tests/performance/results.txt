@@ -1,0 +1,32 @@
+-------------------------------------
+Predictions results
+Number of requests: 1000
+Total response time: 98.241283063
+Mean response time: 0.0979751306610001
+99 percentile: 0.14695109104999948
+Throughput (requests per second): 10.179020151423732
+Peak response time: 0.23784575199999836
+-------------------------------------
+Recomendation results
+Number of requests: 1000
+Total response time: 37.940583849999996
+Mean response time: 0.03768019796299984
+99 percentile: 0.04900324304997781
+Throughput (requests per second): 26.35700082933753
+Peak response time: 0.052802034999984926
+-------------------------------------
+Predictions results in single thread
+Number of requests: 1000
+Total response time: 100.43262772999998
+Mean response time: 0.10014822883500034
+99 percentile: 0.13779469474000564
+Throughput (requests per second): 9.956923587505543
+Peak response time: 0.18301060199999597
+-------------------------------------
+Recommendations results in single thread
+Number of requests: 1000
+Total response time: 40.290631081999976
+Mean response time: 0.039995732803000235
+99 percentile: 0.04960867328000887
+Throughput (requests per second): 24.819665841539887
+Peak response time: 0.05437200100004702
