@@ -57,8 +57,6 @@ def get_topn_algo_class(algo):
         return basic.Popular()
     elif algo == 'bias':
         return basic.TopN(basic.Bias())
-    # elif algo == 'topn':
-    #     return basic.TopN(basic.Bias())
     elif algo == 'itemitem':
         return basic.TopN(iknn.ItemItem(nnbrs=-1, center=False, aggregate='sum'))
     elif algo == 'useruser':
@@ -120,3 +118,4 @@ if __name__ == "__main__":
 
 # python train_save_model.py algos from_data_files
 # python train_save_model.py popular,bias,itemitem,useruser,biasedmf,implicitmf,funksvd,bpr False
+# python train_save_model.py popular,bias,useruser,biasedmf,implicitmf,funksvd,bpr False

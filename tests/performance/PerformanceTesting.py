@@ -2,8 +2,6 @@
 # coding: utf-8
 
 # In[65]:
-
-
 import asyncio
 import aiohttp
 import json
@@ -20,8 +18,6 @@ from time import perf_counter
 # # Performance Testing
 
 # In[3]:
-
-
 class ConfigReader:
     def get_value(self, key):
         with open('config.json') as json_data_file:
@@ -30,8 +26,6 @@ class ConfigReader:
 
 
 # In[59]:
-
-
 class DbManager:
     def __init__(self):
         reader = ConfigReader()
@@ -51,9 +45,7 @@ class DbManager:
 # ## Get random users
 
 # In[61]:
-
-
-n_rand_users = 10
+n_rand_users = 1000
 dbManager = DbManager()
 db_users = dbManager.get_users()
 n_rand_users = db_users.sample(n=n_rand_users)
@@ -62,11 +54,9 @@ n_rand_users = db_users.sample(n=n_rand_users)
 # ## Test recommendation endpoint
 
 # In[62]:
-
-
 base_url = 'http://127.0.0.1:8000'
 algo_rec = 'popular'
-algo_pred = 'biasedmf'
+algo_pred = 'biasedmf' # 'biasedmf'
 n_recs = 5
 items = "10,20,30,40,50"
 
@@ -75,49 +65,40 @@ items = "10,20,30,40,50"
 
 # In[67]:
 
-
-def print_stats(times, time_taken_all, num_requests):
+def print_stats(time_taken_all, num_requests):
     print(f'Total response time: {time_taken_all}')
-    print(f'Mean response time: {time_taken_all / num_requests}')
-    #print(f'Mean response time: {np.mean(times)}')
-    #print(f'99 percentile: {np.quantile(times, 0.99)}')
     print(f'Throughput (requests per second): {num_requests / time_taken_all}')
-    #print(f'Peak response time: {max(times)}')
     
 async def get_recs():
-    times = []
+    tasks = []    
     num_requests = len(n_rand_users)
     print(f'Number of requests: {num_requests}')
     start_recs = perf_counter()
-    for idx, row in n_rand_users.iterrows():
-        start = perf_counter()
-        await get_user_results(row['userId'], n_recs, algo_rec, None)
-        time_taken = perf_counter() - start
-        times.append(time_taken)
-#        print(f'Response time: {time_taken}')
-    time_taken_all = perf_counter() - start_recs
-    print_stats(times, time_taken_all, num_requests)
 
-async def get_preds():
-    tasks = []
-    times = []
-    start_preds = perf_counter()
-    num_requests = len(n_rand_users)
-    print(f'Number of requests: {num_requests}')
     async with aiohttp.ClientSession() as session:
         for idx, row in n_rand_users.iterrows():
-            #start = perf_counter()
-#            await get_user_results(row['userId'], None, algo_pred, items)
+            task = asyncio.ensure_future(get_user_results(row['userId'], n_recs, algo_rec, None, session))
+            tasks.append(task)     
+
+        responses = await asyncio.gather(*tasks)
+        time_taken_all = perf_counter() - start_recs
+        print_stats(time_taken_all, num_requests)
+
+async def get_preds():
+    tasks = []    
+    num_requests = len(n_rand_users)
+    print(f'Number of requests: {num_requests}')
+    start_preds = perf_counter()
+
+    async with aiohttp.ClientSession() as session:
+        for idx, row in n_rand_users.iterrows():
             task = asyncio.ensure_future(get_user_results(row['userId'], None, algo_pred, items, session))
-            tasks.append(task)
-            #time_taken = perf_counter() - start
-            #times.append(time_taken)
-        #   print(f'Response time: {time_taken}')
-#        print(sum(times))
+            tasks.append(task)         
+
         responses = await asyncio.gather(*tasks)
         time_taken_all = perf_counter() - start_preds
-        print_stats(times, time_taken_all, num_requests)
-    
+        print_stats(time_taken_all, num_requests)
+
 async def get_user_results(userId, nr_recs, algo, items, session):
     is_a_rec_request = True if algo == 'popular' or algo == 'topn' else False
     if is_a_rec_request:
@@ -128,36 +109,12 @@ async def get_user_results(userId, nr_recs, algo, items, session):
         data = await resp.json()
         #data = resp.json()
 
-
-# In[68]:
-print('-------------------------------------')
-print('Predictions results')
-loop = asyncio.get_event_loop()
-future = asyncio.ensure_future(get_preds())
-loop.run_until_complete(future)
-exit()
-
-# In[42]:
-
-# print('-------------------------------------')
-# print('Recomendation results')
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(get_recs())
-# loop.close()
-
-
 # ### Single thread performance
 
 # In[69]:
-
-
 def print_stats_single_thread(times, time_taken_all, num_requests):
     print(f'Total response time: {time_taken_all}')
-#   print(f'Average load time: {time_taken_all / num_requests}')
-    print(f'Mean response time: {np.mean(times)}')
-    print(f'99 percentile: {np.quantile(times, 0.99)}')
     print(f'Throughput (requests per second): {num_requests / time_taken_all}')
-    print(f'Peak response time: {max(times)}')
     
 def get_recs_single_thread():
     times = []
@@ -199,21 +156,24 @@ def get_user_results_single_thread(userId, nr_recs, algo, items):
 
 
 # In[70]:
+# Results
+print('-------------------------------------')
+print('Predictions results')
+loop = asyncio.get_event_loop()
+future = asyncio.ensure_future(get_preds())
+loop.run_until_complete(future)
 
 print('-------------------------------------')
 print('Predictions results in single thread')
 get_preds_single_thread()
 
-
-# In[51]:
+# In[42]:
+# print('-------------------------------------')
+# print('Recomendation results')
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(get_recs())
+# loop.close()
 
 # print('-------------------------------------')
 # print('Recommendations results in single thread')
 # get_recs_single_thread()
-
-
-# In[ ]:
-
-
-
-

@@ -20,17 +20,22 @@ mysql-connector-python
 Curl Testing API
 
 Upload the model file:
-curl -X PUT http://127.0.0.1:5000/algorithms/bias/modelfile -F file=@"model.pickle"
 
-curl -X PUT http://127.0.0.1:5000/algorithms/bias/modelfile -F file=@"bias.bpk"
+curl -X PUT http://127.0.0.1:8000/algorithms/popular/modelfile -F file=@"popular.bpk"  -v > /dev/null
+
+curl -d "user_id=1&items=5,102,203,304,400" -X GET http://127.0.0.1:8000/algorithms/bias/predictions -v > /dev/null
 
 curl --header "Content-Type: application/json" \
   --request POST \
-  --data '{"user_id":2038,"num_recs":10}' \
-  http://127.0.0.1:5000/recommendations
+  --data '{"user_id":1,"items":5,102,203,304,400}' \
+  http://127.0.0.1:8000/algorithms/bias/predictions -v > /dev/null
+
+  curl -X GET http://127.0.0.1:8000/algorithms/popular/info -v > /dev/null
 
 curl -d "user_id=22&items=5,102,203,304,400" http://127.0.0.1:5000/algorithms/funksvd/predictions
 curl -d "user_id=22&items=5,102,203,304,400" http://127.0.0.1:5000/algorithms/itemitem/predictions
+
+curl -d "user_id=22&items=5,102,203,304,400" -X POST http://127.0.0.1:8000/algorithms/funksvd/predictions -v > /dev/null
 
 ------------------------------------------------------------------------
 Gunicorn:

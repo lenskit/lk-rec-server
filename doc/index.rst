@@ -16,12 +16,14 @@ Endpoints:
         GET /recommendations/?user_id=1&num_recs=5
         Host: example.com
         Accept: application/json, text/javascript
+        Content-Length: 20
 
     .. sourcecode:: none
 
         POST /recommendations        
         Host: example.com
         Accept: application/json, text/javascript
+        Content-Length: 26
 
         Data: { "user_id" : 1, "num_recs" : 5 }
 
@@ -30,8 +32,8 @@ Endpoints:
     .. sourcecode:: none
 
         HTTP/1.1 200 OK
-        Vary: Accept
         Content-Type: application/json
+        Content-Length: 178
 
         {
         "recommendations": [
@@ -76,12 +78,14 @@ Endpoints:
         GET /algorithms/popular/recommendations?user_id=1&num_recs=5
         Host: example.com
         Accept: application/json, text/javascript
+        Content-Length: 20
 
     .. sourcecode:: none
 
         POST /algorithms/popular/recommendations
         Host: example.com
         Accept: application/json, text/javascript
+        Content-Length: 26
 
         Data: { "user_id" : 1, "num_recs" : 5 }
 
@@ -90,8 +94,8 @@ Endpoints:
     .. sourcecode:: none
 
         HTTP/1.1 200 OK
-        Vary: Accept
         Content-Type: application/json
+        Content-Length: 178
 
         {
         "recommendations": [
@@ -136,12 +140,14 @@ Endpoints:
         GET /algorithms/bias/predictions?user_id=1&items=5,102,203,304,400
         Host: example.com
         Accept: application/json, text/javascript
+        Content-Length: 33
 
     .. sourcecode:: none
 
         POST /algorithms/bias/predictions
         Host: example.com
         Accept: application/json, text/javascript
+        Content-Length: 39
 
         Data: { "user_id" : 1, "items" : 5,102,203,304,400 }
 
@@ -150,8 +156,8 @@ Endpoints:
     .. sourcecode:: none
 
         HTTP/1.1 200 OK
-        Vary: Accept
         Content-Type: application/json
+        Content-Length: 212
 
         {
         "predictions": [
@@ -202,8 +208,8 @@ Endpoints:
     .. sourcecode:: none
 
         HTTP/1.1 200 OK
-        Vary: Accept
         Content-Type: application/json
+        Content-Length: 105
 
         {
             "model": {
@@ -222,16 +228,17 @@ Endpoints:
 
     .. sourcecode:: none
 
-        GET /algorithms/popular/modelfile
+        PUT /algorithms/popular/modelfile
         Host: example.com
-        Accept: application/json, text/javascript   
+        Content-Length: 103863987
+        Content-Type: multipart/form-data;
 
     **Example response**:
 
     .. sourcecode:: none
 
         HTTP/1.1 200 OK
-        Vary: Accept
         Content-Type: application/json
+        Content-Length: 15
 
         { 'result' : 200 }

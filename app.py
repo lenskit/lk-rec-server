@@ -1,4 +1,8 @@
+import os
 from flask import Flask, jsonify, abort, make_response, request
+from os import path, listdir
+from pathlib import Path
+from datetime import datetime
 from controller import Controller
 import config_reader
 
@@ -31,16 +35,16 @@ def status():
     """
     return jsonify({"status": 200})
 
-@app.route('/preloadmodels', methods=['GET'])
-def preload_models():
-    """
-    Preload the model files into memory, so workers can share them.
+# @app.route('/preloadmodels', methods=['GET'])
+# def preload_models():
+#     """
+#     Preload the model files into memory, so workers can share them.
 
-    Returns:
+#     Returns:
 
-    """
-    Controller.preload_models()
-    return jsonify({"status": 200})
+#     """
+#     Controller.preload_models()
+#     return jsonify({"status": 200})
 
 # @app.route('/recommendations', methods=['GET', 'POST'])
 # def recommend_default():
@@ -115,8 +119,20 @@ def get_model_info(algo):
     Returns:
         Information from the model file such as creation_date, updated_date and size.
     """
-    ctrl = Controller()
-    return jsonify({'model': ctrl.get_model_info(algo)})
+    # ctrl = Controller()    
+    # return jsonify({'model': ctrl.get_model_info(algo)})
+    model_file_dir_path = "models/" + algo + '.bpk'
+    creation_date = None
+    updated_date = None
+    size = 0
+    if path.exists(model_file_dir_path):
+        creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S') 
+        updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S')
+        size = path.getsize(model_file_dir_path) / 1000
+        # dates are in UTC format and size is in KB
+        return jsonify({'model': {"creation_date": creation_date, "updated_date": updated_date, "size": size }}) 
+    else:
+        return jsonify({'model': {}})
 
 @app.route('/algorithms/<algo>/modelfile', methods=['PUT'])
 def upload_model(algo):
@@ -134,7 +150,16 @@ def upload_model(algo):
     keys = list(request.files.keys())
     if len(keys) > 0:
         file = request.files.get(keys[0], None)
-        ctrl.upload_model(algo, file) # upload the first entry file
+        #ctrl.upload_model(algo, file) # upload the first entry file
+        
+        # save the model file in a temp file
+        ts = datetime.now().timestamp()
+        temp_file_name = Path(f'models/{algo}_{ts}.bpk')
+        file.save(temp_file_name)
+        # rename the temp file name
+        file_name = Path(f'models/{algo}.bpk')
+        os.rename(temp_file_name, file_name)
+
         return jsonify({'result': 200})
     else:
         return jsonify({'result': 'No file sent'})
@@ -147,6 +172,8 @@ def get_preds_params():
     user_id = int(get_param_value('user_id'))    
     items = list(map(int, get_param_value('items').split(',')))
     ratings = db_manager.get_ratings_for_user(user_id)
+    ratings.set_index('item', inplace=True)
+    ratings = ratings.iloc[:, 0]
     return user_id, items, ratings
 
 def execute_model(algo, base_class, list_name, func, func_params):

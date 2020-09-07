@@ -23,7 +23,10 @@ def get_ratings_for_user(user_id):
 
 def try_connect_db(sql_statement, count):
     try:
-        return sql.read_sql(sql_statement, create_engine(get_conn_string()))
+        engine = create_engine(get_conn_string())
+        result = sql.read_sql(sql_statement, engine)
+        engine.dispose()
+        return result
     except:
         count += 1
         print("Trying to call the database again. Attempt number: " + str(count))
