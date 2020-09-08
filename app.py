@@ -3,7 +3,6 @@ from flask import Flask, jsonify, abort, make_response, request
 from os import path, listdir
 from pathlib import Path
 from datetime import datetime
-from controller import Controller
 import config_reader
 
 from functools import wraps
@@ -119,8 +118,6 @@ def get_model_info(algo):
     Returns:
         Information from the model file such as creation_date, updated_date and size.
     """
-    # ctrl = Controller()    
-    # return jsonify({'model': ctrl.get_model_info(algo)})
     model_file_dir_path = "models/" + algo + '.bpk'
     creation_date = None
     updated_date = None
@@ -146,11 +143,9 @@ def upload_model(algo):
     Returns:
         A result message of the operation.
     """
-    ctrl = Controller()
     keys = list(request.files.keys())
     if len(keys) > 0:
         file = request.files.get(keys[0], None)
-        #ctrl.upload_model(algo, file) # upload the first entry file
         
         # save the model file in a temp file
         ts = datetime.now().timestamp()

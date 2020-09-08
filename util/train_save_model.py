@@ -117,5 +117,4 @@ if __name__ == "__main__":
     save_models(sys.argv[1], from_data_files)
 
 # python train_save_model.py algos from_data_files
-# python train_save_model.py popular,bias,itemitem,useruser,biasedmf,implicitmf,funksvd,bpr False
-# python train_save_model.py popular,bias,useruser,biasedmf,implicitmf,funksvd,bpr False
+# E.g. python train_save_model.py popular,bias,itemitem,useruser,biasedmf,implicitmf,funksvd,bpr False

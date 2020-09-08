@@ -15,7 +15,6 @@ Feature: predictions
       | 2        |  2,20        |
       | 3        |  3,30        |  
 
-  # TODO: need to figure out how to insert the ratings of these new users (in sql file in db maybe)
   Scenario Outline: Get items predictions for a new user
     Given the predict API is called with <user_id> and <items>
     Then the response status code is "200"
