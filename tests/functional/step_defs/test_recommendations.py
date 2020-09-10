@@ -38,6 +38,7 @@ def get_trained_als_model(http_service):
     right_url = 'algorithms/popular/info'
     response = requests.get(http_service + right_url)
     print(response)
+    print(response.json())
     assert len(response.json()['model']) > 0
 
 @given('the recommend API is called with <user_id> and <num_recs>')

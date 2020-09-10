@@ -13,8 +13,8 @@ Feature: recommendations
     Examples:
       | user_id  |  num_recs  |
       | 1        |  5         |
-      | 2        |  10        |
-      | 3        |  15        |
+      # | 2        |  10        |
+      # | 3        |  15        |
 
   # Scenario Outline: Recommend items for a new user
   #   Given the recommend API is called with <user_id> and <num_recs>
