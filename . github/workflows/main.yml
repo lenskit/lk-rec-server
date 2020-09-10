@@ -1,0 +1,21 @@
+name: Continuous Integration workflow
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install packages
+        run: pip3 install -r requirements.txt
+
+    - name: Test Application
+      run: |
+        pytest
