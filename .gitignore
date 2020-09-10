@@ -6,6 +6,5 @@ data.db
 data/
 .DS_Store
 models/
-test_db/files/
 tests/performance/.ipynb_checkpoints/
 build/
