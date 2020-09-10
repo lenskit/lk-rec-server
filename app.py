@@ -22,7 +22,7 @@ def get_param_value(key):
 
 @app.errorhandler(404)
 def resource_not_found(e):
-    return jsonify(error=str(e)), 404    
+    return jsonify(error=str(e)), 404
 
 @app.route('/status', methods=['GET'])
 def status():
@@ -33,79 +33,6 @@ def status():
         The status number 200.
     """
     return jsonify({"status": 200})
-
-# @app.route('/preloadmodels', methods=['GET'])
-# def preload_models():
-#     """
-#     Preload the model files into memory, so workers can share them.
-
-#     Returns:
-
-#     """
-#     Controller.preload_models()
-#     return jsonify({"status": 200})
-
-# @app.route('/recommendations', methods=['GET', 'POST'])
-# def recommend_default():
-#     """
-#     Get recommendations from the default configured algorithm.
-
-#     Returns:
-#         A list of recommendations with items and scores.
-#     """
-#     algo = config_reader.get_value("default_algorithm")
-#     return recommend(algo)
-
-# Test local urls:
-# http://127.0.0.1:8000/algorithms/popular/recommendations?user_id=2038&num_recs=10
-#@app.route('/algorithms/<algo>/recommendations/<int:user_id>/<int:num_recs>', methods=['GET', 'POST'])
-# @app.route('/algorithms/<algo>/recommendations', methods=['GET', 'POST'])
-# def recommend(algo):
-#     """
-#     Get recommendations using the algorithm and user id sent.
-
-#     Args:
-#         algo: algorithm to be used.
-#         user_id: user id to get recommendations for.
-#         num_recs: number of recommendations to return.
-
-#     Returns:
-#         A list of recommendations with items and scores.
-#     """
-#     user_id = get_param_value('user_id')
-#     num_recs = get_param_value('num_recs')
-
-#     ctrl = Controller()
-#     recs = ctrl.get_results_from_model(user_id, num_recs, algo, None)
-#     return jsonify({'recommendations': recs})
- 
- # Test local urls:
- # http://127.0.0.1:5001/algorithms/bias/predictions?user_id=22&items=5,102,203,304,400
- # http://127.0.0.1:5001/algorithms/itemitem/predictions?user_id=22&items=5,102,203,304,400
- # http://127.0.0.1:5001/algorithms/useruser/predictions?user_id=22&items=5,102,203,304,400
- # http://127.0.0.1:5001/algorithms/biasedmf/predictions?user_id=22&items=5,102,203,304,400
- # http://127.0.0.1:5001/algorithms/implicitmf/predictions?user_id=22&items=5,102,203,304,400
- # http://127.0.0.1:5001/algorithms/funksvd/predictions?user_id=22&items=5,102,203,304,400
-# @app.route('/algorithms/<algo>/predictions', methods=['GET', 'POST'])
-# def predict(algo):
-#     """
-#     Get predictions using the algorithm, user id and items sent.
-
-#     Args:
-#         algo: algorithm to be used.
-#         user_id: user id to get predictions for.
-#         items: items to get predictions for.
-
-#     Returns:
-#         A list of predictions with items and scores.
-#     """
-#     user_id = int(get_param_value('user_id'))
-#     items = get_param_value('items')    
-#     ctrl = Controller()
-#     items = list(map(int, items.split(',')))
-
-#     preds = ctrl.get_results_from_model(user_id, None, algo, items)
-#     return jsonify({'predictions': preds})
 
 @app.route('/algorithms/<algo>/info', methods=['GET'])
 def get_model_info(algo):
@@ -123,11 +50,15 @@ def get_model_info(algo):
     updated_date = None
     size = 0
     if path.exists(model_file_dir_path):
-        creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S') 
-        updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path)).strftime('%Y-%m-%d %H:%M:%S')
+        creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path))
+        updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path))
         size = path.getsize(model_file_dir_path) / 1000
         # dates are in UTC format and size is in KB
-        return jsonify({'model': {"creation_date": creation_date, "updated_date": updated_date, "size": size }}) 
+        return jsonify({'model': {
+            "creation_date": creation_date.strftime('%Y-%m-%d %H:%M:%S'), 
+            "updated_date": updated_date.strftime('%Y-%m-%d %H:%M:%S'), 
+            "size": size 
+        }})
     else:
         return jsonify({'model': {}})
 
@@ -196,22 +127,14 @@ def model_method(name, base_class, list_name, methods=['GET', 'POST']):
 		return app.route(route, methods=methods)(wrapper)
 	return deco_wrap
 
-model_method("recommendations", Recommender, 'recommendations')(lenskit_proxy.get_recommendations_from_model, get_recs_params)
-model_method("predictions", Predictor, 'predictions')(lenskit_proxy.get_predictions_from_model, get_preds_params)
-model_method("recommendations", Recommender, 'recommendations')(get_recommendations_from_default, get_recs_params, True)
+model_method("recommendations", Recommender, 'recs')
+(lenskit_proxy.get_recommendations_from_model, get_recs_params)
 
+model_method("predictions", Predictor, 'preds')
+(lenskit_proxy.get_predictions_from_model, get_preds_params)
 
-
-# # Save all the algo models to disk
-# # http://127.0.0.1:5000/save_models/popular,bias,topn,itemitem,useruser,biasedmf,implicitmf,funksvd
-# @app.route('/save_models/<algos>', methods=['GET'])
-# def save_models(algos):
-#     ctrl = Controller()
-#     ctrl.save_models(algos)
-#     return jsonify({"result": 200})
-    
-# print('loading models...')
-# Controller.preload_models()
+model_method("recommendations", Recommender, 'recs')
+(get_recommendations_from_default, get_recs_params, True)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
