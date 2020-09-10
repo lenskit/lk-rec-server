@@ -22,9 +22,9 @@ jobs:
       run: |
         pip3 install -r requirements.txt
         pip install pylint
-    - name: Run pylint
-      run: |
-        pylint `ls -R|grep .py$|xargs`
+    # - name: Run pylint
+    #   run: |
+    #     pylint `ls -R|grep .py$|xargs`
     - name: Test Application
       run: |
         pytest
