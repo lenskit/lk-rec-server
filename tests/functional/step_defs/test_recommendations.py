@@ -4,8 +4,6 @@ import requests
 from pytest_bdd import scenarios, given, then, parsers
 from requests.exceptions import ConnectionError
 
-#BASE_URL_API = 'http://127.0.0.1:5000/'
-
 def is_responsive(url):
     try:
         response = requests.get(url)

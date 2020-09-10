@@ -55,9 +55,9 @@ def get_model_info(algo):
         size = path.getsize(model_file_dir_path) / 1000
         # dates are in UTC format and size is in KB
         return jsonify({'model': {
-            "creation_date": creation_date.strftime('%Y-%m-%d %H:%M:%S'), 
-            "updated_date": updated_date.strftime('%Y-%m-%d %H:%M:%S'), 
-            "size": size 
+            "creation_date": creation_date.strftime('%Y-%m-%d %H:%M:%S'),
+            "updated_date": updated_date.strftime('%Y-%m-%d %H:%M:%S'),
+            "size": size
         }})
     else:
         return jsonify({'model': {}})
@@ -69,15 +69,13 @@ def upload_model(algo):
 
     Args:
         algo: algorithm to update the information for.
-        file: model file to use 
-
+        file: model file to use
     Returns:
         A result message of the operation.
     """
     keys = list(request.files.keys())
     if len(keys) > 0:
         file = request.files.get(keys[0], None)
-        
         # save the model file in a temp file
         ts = datetime.now().timestamp()
         temp_file_name = Path(f'models/{algo}_{ts}.bpk')
