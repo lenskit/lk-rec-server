@@ -45,7 +45,7 @@ class DbManager:
 # ## Get random users
 
 # In[61]:
-n_rand_users = 1000
+n_rand_users = 10
 dbManager = DbManager()
 db_users = dbManager.get_users()
 n_rand_users = db_users.sample(n=n_rand_users)
