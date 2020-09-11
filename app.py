@@ -79,7 +79,7 @@ def upload_model(algo):
         # save the model file in a temp file
         ts = datetime.now().timestamp()
         # create folder if not exists
-        Path("\models").mkdir(exist_ok=True)
+        Path("models").mkdir(exist_ok=True)
         temp_file_name = Path(f'models\{algo}_{ts}.bpk')
         file.save(temp_file_name)
         # rename the temp file name
