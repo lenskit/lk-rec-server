@@ -69,7 +69,7 @@ def get_model_empty_information(get_trained_model_response):
 def ddg_response_code(get_trained_model_response, code):
     assert get_trained_model_response.status_code == code
 
-@then(parsers.parse('the response status code is "{code:d}" and "{result}"'))
+@then(parsers.parse('the response status code is "{code:d}" and the json result is {result:d}'))
 def ddg_upload_model_response_code(get_upload_model_response, code, result):
     print(get_upload_model_response)
     print(get_upload_model_response.json())

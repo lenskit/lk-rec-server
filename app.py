@@ -45,7 +45,7 @@ def get_model_info(algo):
     Returns:
         Information from the model file such as creation_date, updated_date and size.
     """
-    model_file_dir_path = "models/" + algo + '.bpk'
+    model_file_dir_path = "models\\" + algo + '.bpk'
     creation_date = None
     updated_date = None
     size = 0
@@ -75,13 +75,15 @@ def upload_model(algo):
     """
     keys = list(request.files.keys())
     if len(keys) > 0:
+        if not os.path.exists('models'):
+            os.makedirs('models')
         file = request.files.get(keys[0], None)
         # save the model file in a temp file
         ts = datetime.now().timestamp()
-        temp_file_name = Path(f'models/{algo}_{ts}.bpk')
+        temp_file_name = Path(f'models\{algo}_{ts}.bpk')
         file.save(temp_file_name)
         # rename the temp file name
-        file_name = Path(f'models/{algo}.bpk')
+        file_name = Path(f'models\{algo}.bpk')
         os.rename(temp_file_name, file_name)
 
         return jsonify({'result': 200})
