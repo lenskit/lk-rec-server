@@ -14,6 +14,7 @@ Feature: models
       | bias        |
       | topn        |
       | implicitmf  |
+      | biasedmf    |
 
   Scenario Outline: Get model info for an existing model file
     Given a trained recommender model for <algo>
@@ -24,6 +25,7 @@ Feature: models
       | popular     |
       | bias        |
       | topn        |
+      | implicitmf  |
       | biasedmf    |
 
   Scenario Outline: Get model info for a non-existing model file

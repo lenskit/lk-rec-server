@@ -45,7 +45,7 @@ def get_model_info(algo):
     Returns:
         Information from the model file such as creation_date, updated_date and size.
     """
-    model_file_dir_path = "models\\" + algo + '.bpk'
+    model_file_dir_path = "models/" + algo + '.bpk'
     creation_date = None
     updated_date = None
     size = 0

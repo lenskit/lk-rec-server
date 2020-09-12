@@ -31,15 +31,13 @@ scenarios('../features/models.feature', example_converters=dict(user_id=int, num
 @given('a running recommendation server')
 def is_server_running(http_service):
     response = requests.get(http_service + "status")
-    print(response)
-    print(response.json())
     assert response.status_code == 200
 
 @given('a trained recommender model for <algo>')
 def get_trained_model_response(http_service, algo):
     right_url = f'algorithms/{algo}/info'
+    print(http_service + right_url)
     response = requests.get(http_service + right_url)
-    # assert len(response.json()['model']) > 0
     return response
 
 @given('upload model for <algo>')
