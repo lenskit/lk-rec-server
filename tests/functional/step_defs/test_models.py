@@ -36,7 +36,6 @@ def is_server_running(http_service):
 @given('a trained recommender model for <algo>')
 def get_trained_model_response(http_service, algo):
     right_url = f'algorithms/{algo}/info'
-    print(http_service + right_url)
     response = requests.get(http_service + right_url)
     return response
 
@@ -69,7 +68,5 @@ def ddg_response_code(get_trained_model_response, code):
 
 @then(parsers.parse('the response status code is "{code:d}" and the json result is {result:d}'))
 def ddg_upload_model_response_code(get_upload_model_response, code, result):
-    print(get_upload_model_response)
-    print(get_upload_model_response.json())
     assert get_upload_model_response.status_code == code
     assert get_upload_model_response.json()['result'] == result
