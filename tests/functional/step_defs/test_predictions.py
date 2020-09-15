@@ -20,7 +20,7 @@
 #     port = docker_services.port_for("recserver", 5000)
 #     url = "http://{}:{}/".format(docker_ip, port)
 #     docker_services.wait_until_responsive(
-#         timeout=60.0, pause=0.1, check=lambda: is_responsive(url)
+#         timeout=30.0, pause=0.1, check=lambda: is_responsive(url)
 #     )
 #     return url
 
@@ -35,7 +35,8 @@
 
 # @given('a trained recommender model')
 # def get_trained_als_model(http_service):
-#     right_url = 'algorithms/biasedmf/info'
+#     right_url = 'algorithms/bias/info'
+#     print(http_service + right_url)
 #     response = requests.get(http_service + right_url)
 #     assert len(response.json()['model']) > 0
 

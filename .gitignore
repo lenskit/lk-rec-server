@@ -1,10 +1,9 @@
 venv/
-models/
 __pycache__/
 .vscode/
 data.db
 data/
 .DS_Store
-models/
 tests/performance/.ipynb_checkpoints/
 build/
+util/models

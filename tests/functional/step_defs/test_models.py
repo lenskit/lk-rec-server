@@ -31,15 +31,13 @@ scenarios('../features/models.feature', example_converters=dict(user_id=int, num
 @given('a running recommendation server')
 def is_server_running(http_service):
     response = requests.get(http_service + "status")
-    print(response)
-    print(response.json())
     assert response.status_code == 200
 
 @given('a trained recommender model for <algo>')
 def get_trained_model_response(http_service, algo):
     right_url = f'algorithms/{algo}/info'
+    print(http_service + right_url)
     response = requests.get(http_service + right_url)
-    # assert len(response.json()['model']) > 0
     return response
 
 @given('upload model for <algo>')
@@ -69,7 +67,7 @@ def get_model_empty_information(get_trained_model_response):
 def ddg_response_code(get_trained_model_response, code):
     assert get_trained_model_response.status_code == code
 
-@then(parsers.parse('the response status code is "{code:d}" and "{result}"'))
+@then(parsers.parse('the response status code is "{code:d}" and the json result is {result:d}'))
 def ddg_upload_model_response_code(get_upload_model_response, code, result):
     print(get_upload_model_response)
     print(get_upload_model_response.json())

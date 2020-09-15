@@ -75,6 +75,8 @@ def upload_model(algo):
     """
     keys = list(request.files.keys())
     if len(keys) > 0:
+        if not os.path.exists('models'):
+            os.makedirs('models')
         file = request.files.get(keys[0], None)
         # save the model file in a temp file
         ts = datetime.now().timestamp()
