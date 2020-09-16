@@ -7,3 +7,5 @@ data/
 tests/performance/.ipynb_checkpoints/
 build/
 util/models
+tests/performance/*.csv
+tests/performance/models/

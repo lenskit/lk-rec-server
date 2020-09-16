@@ -4,7 +4,7 @@ docker image rm rec-server
 
 docker build -t rec-server .
 docker-compose up
-
+docker-compose up --build
 
 
 
@@ -40,6 +40,8 @@ curl -d "user_id=22&items=5,102,203,304,400" -X POST http://127.0.0.1:8000/algor
 ------------------------------------------------------------------------
 Gunicorn:
 gunicorn --bind 0.0.0.0:5000 wsgi:app
+
+gunicorn -w 4 wsgi:app
 
 # 4 workers, debug mode and min timeout
 gunicorn -w 4 wsgi:app --log-level=debug -t 2400

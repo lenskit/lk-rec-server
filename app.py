@@ -108,8 +108,8 @@ def execute_model(algo, base_class, list_name, func, func_params):
     model = model_manager.load_for_shared_mem(algo)
     if isinstance(model, base_class):
         return jsonify({list_name: func(model, func_params())})
-    else:
-        return abort(404, description="Model not found")
+    # else:
+    #     return abort(404, description="Model not found")
 
 def get_recommendations_from_default(model, args):
     return lenskit_proxy.get_recommendations_from_model(model, args)
@@ -129,14 +129,11 @@ def model_method(name, base_class, list_name, methods=['GET', 'POST']):
 		return app.route(route, methods=methods)(wrapper)
 	return deco_wrap
 
-model_method("recommendations", Recommender, 'recs')
-(lenskit_proxy.get_recommendations_from_model, get_recs_params)
+model_method("recommendations", Recommender, 'recommendations')(lenskit_proxy.get_recommendations_from_model, get_recs_params)
 
-model_method("predictions", Predictor, 'preds')
-(lenskit_proxy.get_predictions_from_model, get_preds_params)
+model_method("predictions", Predictor, 'predictions')(lenskit_proxy.get_predictions_from_model, get_preds_params)
 
-model_method("recommendations", Recommender, 'recs')
-(get_recommendations_from_default, get_recs_params, True)
+model_method("recommendations", Recommender, 'recommendations')(get_recommendations_from_default, get_recs_params, True)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
