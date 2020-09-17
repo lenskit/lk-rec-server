@@ -92,17 +92,19 @@ def upload_model(algo):
     else:
         return jsonify({'result': 'No file sent'})
 
+def get_db_ratings(user_id):
+    ratings = db_manager.get_ratings_for_user(user_id)
+    ratings.set_index('item', inplace=True)
+    return ratings.iloc[:, 0]
 
 def get_recs_params():
-     return get_param_value('user_id'), get_param_value('num_recs')
+    user_id = get_param_value('user_id')
+    return user_id, get_param_value('num_recs'), get_db_ratings(user_id)
 
 def get_preds_params():
     user_id = int(get_param_value('user_id'))    
     items = list(map(int, get_param_value('items').split(',')))
-    ratings = db_manager.get_ratings_for_user(user_id)
-    ratings.set_index('item', inplace=True)
-    ratings = ratings.iloc[:, 0]
-    return user_id, items, ratings
+    return user_id, items, get_db_ratings(user_id)
 
 def execute_model(algo, base_class, list_name, func, func_params):
     model = model_manager.load_for_shared_mem(algo)

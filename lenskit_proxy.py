@@ -7,9 +7,9 @@ import lenskit.algorithms.funksvd as svd
 
 def get_recommendations_from_model(model, *args):
     try:
-        user, nr_recs = args[0][0], args[0][1]
+        user, nr_recs, ratings = args[0][0], args[0][1], args[0][2]
         results = []
-        df_recs = model.recommend(user, int(nr_recs))
+        df_recs = model.recommend(int(user), int(nr_recs), ratings=ratings)
         for index, row in df_recs.iterrows():
             results.append({'item': row['item'], 'score': row['score']})
         return results
