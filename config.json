@@ -2,11 +2,11 @@
     "default_algorithm": "popular",
     "db_connection":
     {
-        "db_engine": "mysql",
-        "connector": "+mysqlconnector",
-        "user": "root",
-        "password": "root",
-        "server": "localhost",
+        "db_engine": "postgres",
+        "connector": "+psycopg2",
+        "user": "postgres",
+        "password": "postgres",
+        "server": "postgresdb",
         "database": "db"
     }
 }
