@@ -9,3 +9,4 @@ build/
 util/models
 tests/performance/*.csv
 tests/performance/models/
+models/

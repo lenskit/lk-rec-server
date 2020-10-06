@@ -1,5 +1,6 @@
 import pytest
 import requests
+import logging
 
 from pytest_bdd import scenarios, given, then, parsers
 from requests.exceptions import ConnectionError
@@ -68,5 +69,7 @@ def ddg_response_code(get_trained_model_response, code):
 
 @then(parsers.parse('the response status code is "{code:d}" and the json result is {result:d}'))
 def ddg_upload_model_response_code(get_upload_model_response, code, result):
+    if get_upload_model_response.status_code != code:
+        logging.error(get_upload_model_response.text)
     assert get_upload_model_response.status_code == code
     assert get_upload_model_response.json()['result'] == result

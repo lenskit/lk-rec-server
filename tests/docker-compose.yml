@@ -11,7 +11,7 @@ services:
       - "5432:5432"       
   recserver:
     build:
-      context: ../
+      context: ../service/
       dockerfile: Dockerfile
     # image: rec-server
     # stdin_open: true # docker run -i

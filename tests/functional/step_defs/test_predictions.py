@@ -1,5 +1,6 @@
 import pytest
 import requests
+import logging
 
 from pytest_bdd import scenarios, given, then, parsers
 from requests.exceptions import ConnectionError
@@ -36,7 +37,7 @@ def is_server_running(http_service):
 @given('a trained recommender model')
 def get_trained_als_model(http_service):
     right_url = 'algorithms/bias/info'
-    print(http_service + right_url)
+    logging.info(http_service + right_url)
     response = requests.get(http_service + right_url)
     assert len(response.json()['model']) > 0
 
@@ -60,6 +61,7 @@ def get_response_empty_list_recs(predictions_response):
     assert len(recs) == 0
 
 @then(parsers.parse('the response status code is "{code:d}"'))
-def ddg_response_code(predictions_response, code):
-    print(predictions_response.text)
+def ddg_response_code(predictions_response, code):    
+    if predictions_response.status_code != code:
+        logging.error(predictions_response.text)
     assert predictions_response.status_code == code

@@ -4,6 +4,7 @@ import config_reader
 from pandas.io import sql
 from datetime import datetime
 import time
+import logging
 
 def get_conn_string():
     db_connection = config_reader.get_value("db_connection")
@@ -29,7 +30,7 @@ def try_connect_db(sql_statement, count):
         return result
     except:
         count += 1
-        print("Trying to call the database again. Attempt number: " + str(count))
+        logging.warning("Trying to call the database again. Attempt number: " + str(count))
         time.sleep(3)
         if count > 5:
             raise

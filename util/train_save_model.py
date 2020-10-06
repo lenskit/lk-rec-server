@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import json
+import logging
 from sqlalchemy import create_engine
 from pandas.io import sql
 from lenskit.algorithms import basic, als, Predictor, Recommender
@@ -94,21 +95,21 @@ def store(data, file_name, sharingmode=True):
 
 def save_models(algos, from_data_files=True):
     if from_data_files:
-        print('Getting data from file')
+        logging.info('Getting data from file')
         ratings = get_ratings_from_file()
     else:
-        print('Getting data from db')
+        logging.info('Getting data from db')
         ratings = get_ratings_from_db()
 
     for algo in algos.split(','):
         algo = algo.strip()
-        print(f'Creating model for {algo}')
+        logging.info(f'Creating model for {algo}')
         model = create_model(algo, ratings)
         if model != None:
             store(model, algo + ".bpk", False)
-            print(f'Model {algo} saved successfully')
+            logging.info(f'Model {algo} saved successfully')
         else:
-            print(f'Algorithm {algo} not found')
+            logging.info(f'Algorithm {algo} not found')
 
 if __name__ == "__main__":
     from_data_files = True
