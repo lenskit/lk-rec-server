@@ -2,11 +2,18 @@
     "default_algorithm": "popular",
     "db_connection":
     {
-        "db_engine": "postgres",
-        "connector": "+psycopg2",
-        "user": "postgres",
-        "password": "postgres",
-        "server": "postgresdb",
-        "database": "db"
+        "db_engine": "mysql",
+        "connector": "+mysqlconnector",
+        "user": "root",
+        "password": "root",
+        "server": "localhost",
+        "database": "db",
+        "pool_size": 20
+    },
+    "rating_table": {
+        "table_name": "rating",
+        "user_column_name": "user",
+        "item_column_name": "item",
+        "rating_column_name": "rating"
     }
 }

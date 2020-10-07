@@ -5,6 +5,7 @@ from pandas.io import sql
 from datetime import datetime
 import time
 import logging
+import sys
 
 def get_conn_string():
     db_connection = config_reader.get_value("db_connection")
@@ -19,17 +20,23 @@ def get_conn_string():
 
 def get_ratings_for_user(user_id):
     count = 0
-    return try_connect_db("SELECT itemId as item, rating FROM ratings WHERE userId = {userId}"
-        .format(userId=user_id), count)
+    rating_table_name = config_reader.get_value("rating_table")["table_name"]
+    user_column_name = config_reader.get_value("rating_table")["user_column_name"]
+    item_column_name = config_reader.get_value("rating_table")["item_column_name"]
+    rating_column_name = config_reader.get_value("rating_table")["rating_column_name"]
+
+    return try_connect_db(f'''SELECT {item_column_name}, {rating_column_name} 
+        FROM {rating_table_name} WHERE {user_column_name} = {user_id}''', count)
 
 def try_connect_db(sql_statement, count):
     try:
-        engine = create_engine(get_conn_string())
+        engine = create_engine(get_conn_string(), pool_size=config_reader.get_value("db_connection")["pool_size"])
         result = sql.read_sql(sql_statement, engine)
         engine.dispose()
         return result
     except:
         count += 1
+        logging.error(f"Unexpected error: {sys.exc_info()[0]}")
         logging.warning("Trying to call the database again. Attempt number: " + str(count))
         time.sleep(3)
         if count > 5:

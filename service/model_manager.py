@@ -85,6 +85,5 @@ class ModelManager:
                 route = f'/{name}'
             else:
                 route = f'/algorithms/<algo>/{name}'
-            print(default_algo)
             return self.app.route(route, methods=methods)(wrapper)
         return deco_wrap   
