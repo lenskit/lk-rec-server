@@ -25,6 +25,9 @@ def get_ratings_for_user(user_id):
     item_column_name = config_reader.get_value("rating_table")["item_column_name"]
     rating_column_name = config_reader.get_value("rating_table")["rating_column_name"]
 
+    if user_column_name == 'user':
+        user_column_name = f"\"{user_column_name}\""
+
     return try_connect_db(f'''SELECT {item_column_name}, {rating_column_name} 
         FROM {rating_table_name} WHERE {user_column_name} = {user_id}''', count)
 

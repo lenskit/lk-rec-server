@@ -4,6 +4,14 @@ import logging
 
 from pytest_bdd import scenarios, given, then, parsers
 from requests.exceptions import ConnectionError
+import train_save_model
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_for_all_tests(http_service):
+    logging.info("init setup")
+    algos = "popular, bias, topn, implicitmf, biasedmf"
+    train_save_model.save_models(algos)
+    logging.info("end setup")
 
 def is_responsive(url):
     try:
@@ -55,6 +63,8 @@ def get_upload_model_response(algo, http_service):
 @then('the response returns the model creation_date and size')
 def get_model_creation_date_and_size(get_trained_model_response):
     model = get_trained_model_response.json()['model']
+    print(model)
+    assert model != "{}"
     assert model['creation_date'] != None
     assert model['size'] != 0
 

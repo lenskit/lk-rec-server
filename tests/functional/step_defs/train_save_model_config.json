@@ -1,5 +1,7 @@
 {
-    "default_algorithm": "popular",
+    "data_folder_path": "tests/functional/data/",
+    "models_folder_path": "tests/functional/test_files/",
+    "ratings_file_name": "ratings.csv",
     "db_connection":
     {
         "db_engine": "postgres",
@@ -9,11 +11,5 @@
         "server": "postgresdb",
         "database": "db",
         "pool_size": 20
-    },
-    "rating_table": {
-        "table_name": "rating",
-        "user_column_name": "user",
-        "item_column_name": "item",
-        "rating_column_name": "rating"
     }
 }

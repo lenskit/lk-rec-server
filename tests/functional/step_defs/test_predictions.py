@@ -36,7 +36,7 @@ def is_server_running(http_service):
 
 @given('a trained recommender model')
 def get_trained_als_model(http_service):
-    right_url = 'algorithms/bias/info'
+    right_url = 'algorithms/implicitmf/info'
     logging.info(http_service + right_url)
     response = requests.get(http_service + right_url)
     assert len(response.json()['model']) > 0
@@ -44,7 +44,7 @@ def get_trained_als_model(http_service):
 @given('the predict API is called with <user_id> and <items>')
 def predictions_response(http_service, user_id, items):
     params = {'user_id': user_id, 'items': items, 'format': 'json'}
-    right_url = 'algorithms/biasedmf/predictions'
+    right_url = 'algorithms/implicitmf/predictions'
     response = requests.get(http_service + right_url, params=params)
     return response
 

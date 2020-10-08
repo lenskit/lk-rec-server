@@ -6,5 +6,5 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 EOSQL
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-\copy ratings FROM '/var/lib/postgresql/ratings.csv' DELIMITER ',' CSV HEADER;
+\copy rating FROM '/var/lib/postgresql/ratings.csv' DELIMITER ',' CSV HEADER;
 EOSQL
