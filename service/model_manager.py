@@ -4,7 +4,6 @@ import math
 from functools import wraps
 from flask import jsonify, request
 from model_file_manager import load_for_shared_mem
-from config_reader import get_value
 from db_manager import get_ratings_for_user
 
 class ModelManager:
@@ -13,7 +12,7 @@ class ModelManager:
         self.app = app
 
     def get_db_ratings(self, user_id):
-        ratings = get_ratings_for_user(user_id)
+        ratings = get_ratings_for_user(user_id, self.app.config)
         ratings.set_index('item', inplace=True)
         return ratings.iloc[:, 0]
 
@@ -78,7 +77,7 @@ class ModelManager:
             @wraps(func)
             def wrapper(algo=None):
                 if default_algo:
-                    algo = get_value("default_algorithm")
+                    algo = self.app.config["DEFAULT_ALGORITHM"]
                 return func(self.execute_model(algo, base_class, get_data_func, get_params_func))
             
             if default_algo:

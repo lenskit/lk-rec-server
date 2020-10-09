@@ -6,7 +6,8 @@ docker build -t rec-server .
 docker-compose up
 docker-compose up --build
 
-
+docker build -t db-server .
+docker run -d -p 6666:6666 db-server
 
 Packages:
 pandas

@@ -13,6 +13,7 @@ from model_file_manager import load_model, store_model
 
 app = Flask(__name__)
 models = ModelManager(app)
+app.config.from_pyfile('./config_debug.cfg')
 
 @app.errorhandler(404)
 def resource_not_found(e):
