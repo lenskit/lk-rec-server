@@ -33,7 +33,7 @@ def get_ratings_from_db():
         password=db_connection['password'],
         server=db_connection['server'])
     db_name = db_connection['database']
-    return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(conn_string + "/" + db_name))
+    return sql.read_sql("SELECT user, item, rating, timestamp FROM rating;", create_engine(conn_string + "/" + db_name))
 
 def get_algo_class(algo):
     if algo == 'popular':
@@ -72,12 +72,17 @@ def get_topn_algo_class(algo):
         return basic.TopN(BPR(25))
 
 def create_model(algo, ratings):
-    algo_class = get_topn_algo_class(algo)
+    create_top_n_models = get_value("create_top_n_models")
+    if create_top_n_models:
+        algo_class = get_topn_algo_class(algo)
+    else:
+        algo_class = get_algo_class(algo)
+
     if algo_class != None:
         algo_class.fit(ratings)
         return algo_class
 
-def store(data, file_name, sharingmode=True):
+def store(data, file_name):
     models_folder_path = get_value("models_folder_path")
     full_file_name = Path(models_folder_path) / file_name
 
@@ -87,6 +92,7 @@ def store(data, file_name, sharingmode=True):
     if not os.path.exists(models_folder_path):
         os.makedirs(models_folder_path)
 
+    sharingmode = get_value("create_memory_optimized_models")
     if sharingmode:
         with sharing_mode():
             dump(data, full_file_name, mappable=True)
@@ -106,12 +112,12 @@ def save_models(algos, from_data_files=True):
         logging.info(f'Creating model for {algo}')
         model = create_model(algo, ratings)
         if model != None:
-            store(model, algo + ".bpk", False)
+            store(model, algo + ".bpk")
             logging.info(f'Model {algo} saved successfully')
         else:
             logging.info(f'Algorithm {algo} not found')
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     from_data_files = True
     if len(sys.argv) > 2:
         from_data_files = not (sys.argv[2].lower() == 'false')

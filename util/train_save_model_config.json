@@ -10,5 +10,7 @@
         "password": "root",
         "server": "localhost",
         "database": "db"
-    }
+    },
+    "create_top_n_models": false,
+    "create_memory_optimized_models": false
 }

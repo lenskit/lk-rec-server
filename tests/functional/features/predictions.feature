@@ -46,6 +46,7 @@ Feature: predictions
   Scenario Outline: Get items predictions for a new user with new ratings
     Given the predict API is called with <user_id> and <items>
     Then the response status code is "200"
+    # change to return a list when Lenskit changes are deployed to prod
     And the response returns an empty list
     Examples:
       | user_id   |  items      |
