@@ -23,21 +23,22 @@ def get_ratings_for_user(user_id, config):
     item_column_name = config["RATING_TABLE_ITEM_COLUMN_NAME"]
     rating_column_name = config["RATING_TABLE_RATING_COLUMN_NAME"]
 
-    if user_column_name == 'user':
-        user_column_name = f"\"{user_column_name}\""
+    # if user_column_name == 'user':
+    #     user_column_name = f"\"{user_column_name}\""
 
     check_sql = f"""SELECT 1 as "value"
         FROM information_schema.columns 
-        WHERE table_schema='public' and table_name='{rating_table_name}' and column_name='{rating_column_name}';"""
+        WHERE table_name='{rating_table_name}' and column_name='{rating_column_name}';"""
     check_rating_column = try_connect_db(check_sql, count, config)
     if len(check_rating_column) > 0:
         count = 0
         return try_connect_db(f'''SELECT {item_column_name}, {rating_column_name} 
-            FROM {rating_table_name} WHERE {user_column_name} = {user_id}''', count, config)
+            FROM {rating_table_name} t WHERE t.{user_column_name} = {user_id}''', count, config)
     else:
+        count = 0
         logging.info("No column rating. Using 1 as rating value.")
         return try_connect_db(f'''SELECT {item_column_name}, 1
-            FROM {rating_table_name} WHERE {user_column_name} = {user_id}''', count, config)
+            FROM {rating_table_name} t WHERE t.{user_column_name} = {user_id}''', count, config)
 
 def try_connect_db(sql_statement, count, config):
     try:

@@ -13,8 +13,11 @@ class ModelManager:
 
     def get_db_ratings(self, user_id):
         ratings = get_ratings_for_user(user_id, self.app.config)
-        ratings.set_index('item', inplace=True)
-        return ratings.iloc[:, 0]
+        if len(ratings) > 0:
+            ratings.set_index('item', inplace=True)
+            return ratings.iloc[:, 0]
+        else:
+            return None
 
     def get_param_value(self, key, *args):
         """First try to get the value from values (query string or form data), if not, from json data. """
