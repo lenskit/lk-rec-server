@@ -5,7 +5,6 @@ Feature: models
     Given a running recommendation server
 
   Scenario Outline: Upload a new model
-    #Given a trained recommender model for <algo>
     Given upload model for <algo>
     Then the response status code is "200" and the json result is 200
     Examples:
