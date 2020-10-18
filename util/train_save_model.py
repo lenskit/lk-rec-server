@@ -99,7 +99,8 @@ def store(data, file_name):
     else:
         dump(data, full_file_name)
 
-def save_models(algos, from_data_files=True):
+def save_models(algos):
+    from_data_files = get_value("from_data_files").lower() == 'true'
     if from_data_files:
         logging.info('Getting data from file')
         ratings = get_ratings_from_file()
@@ -117,11 +118,5 @@ def save_models(algos, from_data_files=True):
         else:
             logging.info(f'Algorithm {algo} not found')
 
-if __name__ == "__main__":    
-    from_data_files = True
-    if len(sys.argv) > 2:
-        from_data_files = not (sys.argv[2].lower() == 'false')
-    save_models(sys.argv[1], from_data_files)
-
-# python train_save_model.py algos from_data_files
-# E.g. python train_save_model.py popular,bias,itemitem,useruser,biasedmf,implicitmf,funksvd,bpr False
+if __name__ == "__main__":
+    save_models(sys.argv[1])
