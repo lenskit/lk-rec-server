@@ -1,6 +1,6 @@
 import os
-from flask import Flask, jsonify, abort, make_response, request
-from os import path, listdir
+from flask import Flask, jsonify, request
+from os import path
 from pathlib import Path
 from datetime import datetime
 import uuid
@@ -13,7 +13,7 @@ from model_file_manager import load_model, store_model
 
 app = Flask(__name__)
 models = ModelManager(app)
-app.config.from_pyfile('./config_debug.cfg')
+app.config.from_pyfile('./config.cfg')
 
 @app.errorhandler(404)
 def resource_not_found(e):

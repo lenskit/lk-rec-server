@@ -5,7 +5,7 @@ import json
 import logging
 from sqlalchemy import create_engine
 from pandas.io import sql
-from lenskit.algorithms import basic, als, Predictor, Recommender
+from lenskit.algorithms import basic, als
 import lenskit.algorithms.item_knn as iknn
 import lenskit.algorithms.user_knn as uknn
 import lenskit.algorithms.funksvd as svd
@@ -13,6 +13,7 @@ from lenskit.algorithms.implicit import BPR
 from pathlib import Path
 from binpickle import dump
 from lenskit.sharing import sharing_mode
+import requests
 
 def get_value(key):
     with open('train_save_model_config.json') as json_data_file:
@@ -99,24 +100,41 @@ def store(data, file_name):
     else:
         dump(data, full_file_name)
 
+def upload_model(algo):
+    rec_server_baese_url = get_value("rec_server_baese_url")
+    right_url = f'algorithms/{algo}/modelfile'
+    model_name = algo + ".bpk"
+    file_path = get_value("models_folder_path") + model_name
+    files = {
+        'file': open(file_path, 'rb')
+    }
+    response = requests.put(rec_server_baese_url + right_url, files=files)
+    return response
+
 def save_models(algos):
-    from_data_files = get_value("from_data_files").lower() == 'true'
+    from_data_files = get_value("from_data_files") == True
     if from_data_files:
-        logging.info('Getting data from file')
+        print('Getting data from file')
         ratings = get_ratings_from_file()
     else:
-        logging.info('Getting data from db')
+        print('Getting data from db')
         ratings = get_ratings_from_db()
 
     for algo in algos.split(','):
         algo = algo.strip()
-        logging.info(f'Creating model for {algo}')
+        print(f'Creating model for {algo}')
         model = create_model(algo, ratings)
         if model != None:
             store(model, algo + ".bpk")
-            logging.info(f'Model {algo} saved successfully')
+            print(f'Model {algo} saved successfully')
         else:
-            logging.info(f'Algorithm {algo} not found')
+            print(f'Algorithm {algo} not found')
+
+    print('Uploading models')
+    for algo in algos.split(','):
+        algo = algo.strip()
+        print(f'Uploading model for {algo}')
+        upload_model(algo)            
 
 if __name__ == "__main__":
     save_models(sys.argv[1])

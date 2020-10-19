@@ -2,11 +2,12 @@ import sys
 import logging
 import math
 from functools import wraps
-from flask import jsonify, request
-from model_file_manager import load_for_shared_mem
+from flask import request
+from model_file_manager import load_for_shared_mem, get_model_file_info
 from db_manager import get_ratings_for_user
 
 class ModelManager:
+    models_cache = {}
 
     def __init__(self, app):
         self.app = app
@@ -66,9 +67,27 @@ class ModelManager:
     def get_recommendations_from_default(model, *args):
         return ModelManager.get_recommendations_from_model(model, *args)
 
+    def get_model(self, algo):
+        if algo not in ModelManager.models_cache:
+            logging.info(f'Adding algo {algo} to cache')
+            model = load_for_shared_mem(algo)
+            info = get_model_file_info(algo)
+            ModelManager.models_cache[algo] = { "model": model, "info": info }
+            return model
+        else:
+            # check the modified datetime of the model to see if we need to reload it.
+            logging.info(f'Reading algo {algo} from cache')
+            model_data = ModelManager.models_cache[algo]
+            info = get_model_file_info(algo)
+            if model_data['info']['updated_date'] != info['updated_date']:
+                logging.info(f'Updating algo {algo} in cache')
+                model = load_for_shared_mem(algo)
+                ModelManager.models_cache[algo] = { "model": model, "info": info }
+            return ModelManager.models_cache[algo]['model']
+
     def execute_model(self, algo, base_class, get_data_func, get_params_func):
-        logging.info("Loading the model")        
-        model = load_for_shared_mem(algo)
+        logging.info("Loading the model")
+        model = self.get_model(algo)
         if isinstance(model, base_class):
             logging.info("Executing the model")
             return get_data_func(model, get_params_func())

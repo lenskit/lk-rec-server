@@ -9,5 +9,10 @@
         "server": "localhost",
         "database": "db",
         "pool_size": 20
-    }
+    },
+    "rec_server_baese_url": "http://127.0.0.1:8000",
+    "n_recs": 5,
+    "items": "10,20,30,40,50",
+    "pred_algos": ["bias","itemitem","useruser","biasedmf","implicitmf","funksvd"],
+    "rec_algos": ["popular"]
 }

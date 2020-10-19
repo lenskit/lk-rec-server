@@ -13,4 +13,5 @@ EXPOSE 5000
 
 # ENTRYPOINT ["python"]
 # CMD ["app.py"]
-CMD ["python", "app.py"]
+#CMD ["python", "app.py"]
+CMD ["gunicorn --bind 0.0.0.0:5000 -w 4 wsgi:app"]

@@ -11,7 +11,9 @@
         "server": "localhost",
         "database": "db"
     },
-    "create_top_n_models": false,
-    "create_memory_optimized_models": false,
-    "from_data_files": true
+    "create_top_n_models": true,
+    "create_memory_optimized_models": true,
+    "from_data_files": true,
+    "upload_models": true,
+    "rec_server_baese_url": "http://127.0.0.1:8000/"
 }
