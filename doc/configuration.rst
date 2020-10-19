@@ -11,7 +11,7 @@ The main configuration file is config.cfg with the extension .cfg. The things yo
 All the packages necessary to run the recommendation server are in the requirements.txt file, which can be easily installed with the command: pip -r requirements.txt
 
 Docker configuration
-The steps to setup the recommendation server are:
+The steps to setup the recommendation server using Docker are:
     1) 
 
 How to extend the recommendation server
