@@ -10,6 +10,7 @@
         "password": "postgres",
         "server": "postgresdb",
         "database": "db",
-        "pool_size": 20
+        "pool_size": 20,
+        "port": 6000
     }
 }

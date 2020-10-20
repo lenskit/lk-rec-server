@@ -9,7 +9,8 @@
         "user": "root",
         "password": "root",
         "server": "localhost",
-        "database": "db"
+        "database": "db",
+        "port": 3306
     },
     "create_top_n_models": true,
     "create_memory_optimized_models": true,

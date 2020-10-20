@@ -7,13 +7,14 @@ import logging
 import sys
 
 def get_conn_string(config):
-    conn_string = '{db_engine}{connector}://{user}:{password}@{server}/{database}'.format(
+    conn_string = '{db_engine}{connector}://{user}:{password}@{server}/{database}?port={port}'.format(
         db_engine=config['DB_CONNECTION_DB_ENGINE'],
         connector=config['DB_CONNECTION_CONNECTOR'],
         user=config['DB_CONNECTION_USER'],
         password=config['DB_CONNECTION_PASSWORD'],
         server=config['DB_CONNECTION_SERVER'],
-        database=config['DB_CONNECTION_DATABASE'])
+        database=config['DB_CONNECTION_DATABASE'],
+        port=config['DB_CONNECTION_PORT'])
     return conn_string
 
 def get_ratings_for_user(user_id, config):

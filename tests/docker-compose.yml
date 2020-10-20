@@ -4,21 +4,16 @@ services:
     build:
       context: ../test_db/
       dockerfile: Dockerfile
-    #image: "postgres-db"
     environment:
        POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"       
+      #- "5432:5432"
+      - "6000:5432"
   recserver:
     build:
       context: ../service/
       dockerfile: Dockerfile
-    # image: rec-server
-    # stdin_open: true # docker run -i
-    # tty: true        # docker run -t
     ports:
       - "5000:5000"
     depends_on:
        - postgresdb
-    # volumes:
-    #   - .:/app

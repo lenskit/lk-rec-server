@@ -33,7 +33,7 @@ def get_ratings_from_db():
         password=db_connection['password'],
         server=db_connection['server'])
     db_name = db_connection['database']
-    return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(conn_string + "/" + db_name))
+    return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(f"{conn_string}/{db_name}?port={db_connection['port']}"))
 
 def get_algo_class(algo):
     if algo == 'popular':

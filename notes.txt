@@ -7,7 +7,7 @@ docker-compose up
 docker-compose up --build
 
 docker build -t db-server .
-docker run -d -p 6666:6666 db-server
+docker run -d -p 6000:6000 db-server
 
 Packages:
 pandas
