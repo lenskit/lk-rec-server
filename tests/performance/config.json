@@ -12,8 +12,12 @@
         "port": 3306
     },
     "rec_server_baese_url": "http://127.0.0.1:8000",
+    "num_requests": 100,
     "n_recs": 5,
     "items": "10,20,30,40,50",
-    "pred_algos": ["bias","biasedmf","implicitmf","funksvd"],
-    "rec_algos": ["popular"]
+    "pred_algos": ["bias"],
+    "rec_algos": ["popular"],
+    "process_length": 6,
+    "workers_config": [1, 2, 4, 8, 12, 16, 24],
+    "inc_config": [1, 2, 4, 4, 4, 8]
 }
