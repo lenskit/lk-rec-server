@@ -95,22 +95,22 @@ def store(data, file_name, sharingmode=True):
 
 def save_models(algos, overwrite=False, from_data_files=True):
     if from_data_files:
-        logging.info('Getting data from file')
+        print('Getting data from file')
         ratings = get_ratings_from_file()
     else:
-        logging.info('Getting data from db')
+        print('Getting data from db')
         ratings = get_ratings_from_db()
 
     for algo in algos.split(','):
         algo = algo.strip()
         full_file_name = Path(get_value("models_folder_path") + algo + ".bpk")
         if full_file_name.exists() and not overwrite:
-            logging.info(f'Model already exists for {algo}. Skipping model creation.')
+            print(f'Model already exists for {algo}. Skipping model creation.')
         else:
-            logging.info(f'Creating model for {algo}')
+            print(f'Creating model for {algo}')
             model = create_model(algo, ratings)
             if model != None:
                 store(model, algo + ".bpk", False)
-                logging.info(f'Model {algo} saved successfully')
+                print(f'Model {algo} saved successfully')
             else:
-                logging.info(f'Algorithm {algo} not found')
+                print(f'Algorithm {algo} not found')

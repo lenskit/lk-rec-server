@@ -4,13 +4,13 @@
     "ratings_file_name": "ratings.csv",
     "db_connection":
     {
-        "db_engine": "postgres",
-        "connector": "+psycopg2",
-        "server": "127.0.0.1",
-        "user": "postgres",
-        "password": "postgres",
+        "db_engine": "mysql",
+        "connector": "+mysqlconnector",
+        "user": "root",
+        "password": "root",
+        "server": "localhost",
         "database": "db",
         "pool_size": 20,
-        "port": 6000
+        "port": 3306
     }
 }

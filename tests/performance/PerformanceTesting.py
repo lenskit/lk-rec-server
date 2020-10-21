@@ -11,7 +11,7 @@
 # %pip install psycopg2
 
 
-# In[9]:
+# In[2]:
 
 
 import asyncio
@@ -28,13 +28,13 @@ from time import perf_counter
 # import matplotlib.pyplot as plt
 # import seaborn as sns
 import pandas as pd
-# import nest_asyncio
-# nest_asyncio.apply()
+import nest_asyncio
+nest_asyncio.apply()
 
 
 # # Performance Testing
 
-# In[10]:
+# In[3]:
 
 
 class ConfigReader:
@@ -44,7 +44,7 @@ class ConfigReader:
         return data[key]
 
 
-# In[11]:
+# In[4]:
 
 
 class DbManager:
@@ -61,12 +61,15 @@ class DbManager:
             port=db_connection['port'])
 
     def get_users(self):
+        # postgres:
+#        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
+        # mysql:
         return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
 
 
 # ## Get random users
 
-# In[12]:
+# In[5]:
 
 
 n_rand_users = num_requests = 10
@@ -77,7 +80,7 @@ n_rand_users = db_users.sample(n=n_rand_users)
 
 # ## Test recommendation endpoint
 
-# In[13]:
+# In[6]:
 
 
 reader = ConfigReader()
@@ -90,7 +93,7 @@ rec_algos = reader.get_value("rec_algos")
 
 # ### Semaphore performance
 
-# In[14]:
+# In[15]:
 
 
 import os
@@ -99,7 +102,7 @@ throughputs = []
 def print_stats(times, time_taken_all, num_requests):
     print(f'Total response time: {round(time_taken_all, 3)}')
     print(f'Throughput (requests per second): {round(num_requests / time_taken_all, 3)}')
-    print(f'Peak response time: {max(round(times, 3))}')
+    print(f'Peak response time: {round(max(times), 3)}')
     print(f'Mean response time: {round(np.mean(times), 3)}')
     print(f'99 percentile: {round(np.quantile(times, 0.99), 3)}')
 
@@ -192,7 +195,7 @@ async def get_user_recs_sem(user, algo, n_recs, session, times):
 
 # ### Warm up phase
 
-# In[15]:
+# In[8]:
 
 
 async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
@@ -210,7 +213,7 @@ async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
         responses = await asyncio.gather(*tasks)
 
 
-# In[16]:
+# In[9]:
 
 
 def warm_up(current_algo=None, num_workers=24, display_logs=True):
@@ -219,7 +222,7 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
     loop.run_until_complete(future)
 
 
-# In[18]:
+# In[10]:
 
 
 warm_up(None, 4)
@@ -258,7 +261,7 @@ def remove_workers(n):
 
 # #### Predictions for different algorithms
 
-# In[12]:
+# In[16]:
 
 
 for algo in pred_algos:
@@ -275,7 +278,7 @@ for algo in pred_algos:
 
 # #### Recommendations
 
-# In[13]:
+# In[17]:
 
 
 algo_rec = 'popular'
@@ -289,14 +292,14 @@ loop.run_until_complete(future)
 
 # ### Speedup Tests
 
-# In[14]:
+# In[18]:
 
 
 throughputs = []
 linear_speedup_algos = ['biasedmf', 'itemitem']
 
 
-# In[15]:
+# In[19]:
 
 
 def call_server(file_name):
@@ -307,14 +310,14 @@ def call_server(file_name):
 #    hist_numbers(file_name)
 
 
-# In[16]:
+# In[20]:
 
 
 workers_config = [1, 2, 4] #, 8, 12, 16, 24]
 inc_config = [1, 2, 4] #, 4, 4, 8]
 
 
-# In[17]:
+# In[23]:
 
 
 for current_algo in linear_speedup_algos:
@@ -340,14 +343,14 @@ for current_algo in linear_speedup_algos:
 
 # #### Throughput by number of workers
 
-# In[18]:
+# In[ ]:
 
 
 # throughput_file_name_workers = 'throughput_single_multiple_workers.csv'
 # np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
 
 
-# In[19]:
+# In[ ]:
 
 
 # throughputs_workers_from_file = np.genfromtxt(throughput_file_name_workers, delimiter=',')
@@ -370,7 +373,7 @@ for current_algo in linear_speedup_algos:
 
 # ### Lenskit
 
-# In[20]:
+# In[24]:
 
 
 import sys
@@ -451,7 +454,7 @@ async def get_user_preds_threads_lkpy(user, algo, items, session, times, model):
 
 # #### Train models
 
-# In[21]:
+# In[29]:
 
 
 import train_save_model
@@ -459,7 +462,7 @@ algos = "bias, biasedmf" #, itemitem"
 train_save_model.save_models(algos)
 
 
-# In[22]:
+# In[30]:
 
 
 lk_recserver_algos = ['bias', 'biasedmf'] #, 'itemitem']

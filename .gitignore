@@ -12,3 +12,5 @@ tests/performance/models/
 models/
 tests/functional/test_files/
 .ipynb_checkpoints/
+*.json
+*.cfg

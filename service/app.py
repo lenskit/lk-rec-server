@@ -45,7 +45,7 @@ def get_model_info(algo):
     updated_date = None
     size = 0
     if path.exists(model_file_dir_path):
-        logging.info("Getting model information")
+        print("Getting model information")
         creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path))
         updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path))
         size = path.getsize(model_file_dir_path) / 1000
@@ -56,7 +56,7 @@ def get_model_info(algo):
             "size": size
         }})
     else:
-        logging.info("No model found for the algorithm")
+        print("No model found for the algorithm")
         return jsonify({'model': {}})
 
 @app.route('/algorithms/<algo>/modelfile', methods=['PUT'])
@@ -74,19 +74,19 @@ def upload_model(algo):
     if len(keys) > 0:
         file = request.files.get(keys[0], None)
         
-        logging.info("Create folder if not exists")
+        print("Create folder if not exists")
         Path("models").mkdir(exist_ok=True)
         
-        logging.info("Save the model with a temporary file name")
+        print("Save the model with a temporary file name")
         temp_model_name = f'{algo}_{uuid.uuid1()}.bpk'
         temp_file_name = Path(f'models/{temp_model_name}')
         file.save(temp_file_name)
 
-        logging.info("Save the model with sharing mode")
+        print("Save the model with sharing mode")
         temp_model = load_model(temp_model_name)
         store_model(temp_model, temp_model_name, True)
 
-        logging.info("Rename the temp file name to the actual algorithm name")
+        print("Rename the temp file name to the actual algorithm name")
         file_name = Path(f'models/{algo}.bpk')
         os.rename(temp_file_name, file_name)
 
