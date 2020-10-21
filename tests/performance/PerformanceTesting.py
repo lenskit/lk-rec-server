@@ -11,7 +11,7 @@
 # %pip install psycopg2
 
 
-# In[1]:
+# In[9]:
 
 
 import asyncio
@@ -25,16 +25,16 @@ from datetime import datetime
 import numpy as np
 import requests
 from time import perf_counter
-import matplotlib.pyplot as plt
-import seaborn as sns
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 import pandas as pd
-import nest_asyncio
-nest_asyncio.apply()
+# import nest_asyncio
+# nest_asyncio.apply()
 
 
 # # Performance Testing
 
-# In[2]:
+# In[10]:
 
 
 class ConfigReader:
@@ -44,20 +44,21 @@ class ConfigReader:
         return data[key]
 
 
-# In[3]:
+# In[11]:
 
 
 class DbManager:
     def __init__(self):
         reader = ConfigReader()
         db_connection = reader.get_value("db_connection")        
-        self.conn_string = '{db_engine}{connector}://{user}:{password}@{server}/{database}'.format(
+        self.conn_string = '{db_engine}{connector}://{user}:{password}@{server}/{database}?port={port}'.format(
             db_engine=db_connection['db_engine'],
             connector=db_connection['connector'],
             user=db_connection['user'],
             password=db_connection['password'],
             server=db_connection['server'],
-            database=db_connection['database'])
+            database=db_connection['database'],
+            port=db_connection['port'])
 
     def get_users(self):
         return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
@@ -65,7 +66,7 @@ class DbManager:
 
 # ## Get random users
 
-# In[4]:
+# In[12]:
 
 
 n_rand_users = num_requests = 10
@@ -76,7 +77,7 @@ n_rand_users = db_users.sample(n=n_rand_users)
 
 # ## Test recommendation endpoint
 
-# In[5]:
+# In[13]:
 
 
 reader = ConfigReader()
@@ -89,7 +90,7 @@ rec_algos = reader.get_value("rec_algos")
 
 # ### Semaphore performance
 
-# In[7]:
+# In[14]:
 
 
 import os
@@ -191,7 +192,7 @@ async def get_user_recs_sem(user, algo, n_recs, session, times):
 
 # ### Warm up phase
 
-# In[8]:
+# In[15]:
 
 
 async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
@@ -209,7 +210,7 @@ async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
         responses = await asyncio.gather(*tasks)
 
 
-# In[9]:
+# In[16]:
 
 
 def warm_up(current_algo=None, num_workers=24, display_logs=True):
@@ -218,7 +219,7 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
     loop.run_until_complete(future)
 
 
-# In[10]:
+# In[18]:
 
 
 warm_up(None, 4)
