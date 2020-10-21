@@ -34,7 +34,7 @@ nest_asyncio.apply()
 
 # # Performance Testing
 
-# In[3]:
+# In[35]:
 
 
 class ConfigReader:
@@ -67,33 +67,11 @@ class DbManager:
         return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
 
 
-# ## Get random users
-
-# In[5]:
-
-
-n_rand_users = num_requests = 10
-dbManager = DbManager()
-db_users = dbManager.get_users()
-n_rand_users = db_users.sample(n=n_rand_users)
-
-
 # ## Test recommendation endpoint
-
-# In[6]:
-
-
-reader = ConfigReader()
-base_url = reader.get_value("rec_server_baese_url")
-n_recs = reader.get_value("n_recs")
-items = reader.get_value("items")
-pred_algos = reader.get_value("pred_algos")
-rec_algos = reader.get_value("rec_algos")
-
 
 # ### Semaphore performance
 
-# In[15]:
+# In[41]:
 
 
 import os
@@ -193,9 +171,63 @@ async def get_user_recs_sem(user, algo, n_recs, session, times):
         times.append(time_taken)   
 
 
+# ### Gunicorn methods
+
+# In[45]:
+
+
+import subprocess
+import os
+
+def get_gunicorn_master_pid():
+    proc1 = subprocess.Popen(['ps', 'ax'], stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(['grep', 'gunicorn'], stdin=proc1.stdout,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    proc1.stdout.close() # Allow proc1 to receive a SIGPIPE if proc2 exits.
+    out, err = proc2.communicate()
+    process_length = ConfigReader().get_value('process_length')
+    master_id = out[:process_length].decode('utf-8').replace(' ', '')
+    return master_id
+
+def add_workers(n):
+    master_id = get_gunicorn_master_pid()
+    for i in range(n):
+        os.system(f"kill -s TTIN {master_id}")
+        
+def remove_workers(n):
+    master_id = get_gunicorn_master_pid()
+    for i in range(n):
+        os.system(f"kill -s TTOU {master_id}")    
+
+
+# ### Get random users
+
+# In[55]:
+
+
+n_rand_users = num_requests = ConfigReader().get_value("num_requests")
+dbManager = DbManager()
+db_users = dbManager.get_users()
+n_rand_users = db_users.sample(n=n_rand_users)
+
+
+# ### Get config values
+
+# In[56]:
+
+
+reader = ConfigReader()
+base_url = reader.get_value("rec_server_baese_url")
+n_recs = reader.get_value("n_recs")
+items = reader.get_value("items")
+pred_algos = reader.get_value("pred_algos")
+rec_algos = reader.get_value("rec_algos")
+
+
 # ### Warm up phase
 
-# In[8]:
+# In[57]:
 
 
 async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
@@ -213,7 +245,7 @@ async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
         responses = await asyncio.gather(*tasks)
 
 
-# In[9]:
+# In[58]:
 
 
 def warm_up(current_algo=None, num_workers=24, display_logs=True):
@@ -222,46 +254,17 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
     loop.run_until_complete(future)
 
 
-# In[10]:
+# In[59]:
 
 
 warm_up(None, 4)
-
-
-# ### Gunicorn methods
-
-# In[11]:
-
-
-import subprocess
-import os
-
-def get_gunicorn_master_pid():
-    proc1 = subprocess.Popen(['ps', 'ax'], stdout=subprocess.PIPE)
-    proc2 = subprocess.Popen(['grep', 'gunicorn'], stdin=proc1.stdout,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    proc1.stdout.close() # Allow proc1 to receive a SIGPIPE if proc2 exits.
-    out, err = proc2.communicate()
-    master_id = out[:6].decode('utf-8').replace(' ', '')
-    return master_id
-
-def add_workers(n):
-    master_id = get_gunicorn_master_pid()
-    for i in range(n):
-        os.system(f"kill -s TTIN {master_id}")
-        
-def remove_workers(n):
-    master_id = get_gunicorn_master_pid()
-    for i in range(n):
-        os.system(f"kill -s TTOU {master_id}")
 
 
 # ### Call predict and recommend from server for canonical config
 
 # #### Predictions for different algorithms
 
-# In[16]:
+# In[60]:
 
 
 for algo in pred_algos:
@@ -282,10 +285,13 @@ for algo in pred_algos:
 
 
 algo_rec = 'popular'
+print(f'Algorithm: {algo_rec}')
 file_name = f'recs_{algo_rec}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'
 loop = asyncio.get_event_loop()
 future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
 loop.run_until_complete(future)
+print('---------------------')
+print('')
 #plot_numbers(file_name)
 #hist_numbers(file_name)
 
@@ -313,8 +319,9 @@ def call_server(file_name):
 # In[20]:
 
 
-workers_config = [1, 2, 4] #, 8, 12, 16, 24]
-inc_config = [1, 2, 4] #, 4, 4, 8]
+reader = ConfigReader()
+workers_config = reader.get_value("workers_config")
+inc_config = reader.get_value("inc_config")
 
 
 # In[23]:

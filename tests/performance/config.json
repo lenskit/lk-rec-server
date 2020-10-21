@@ -11,7 +11,7 @@
         "pool_size": 20,
         "port": 3306
     },
-    "rec_server_baese_url": "http://127.0.0.1:8000",
+    "rec_server_baese_url": "http://127.0.0.1:5000",
     "num_requests": 100,
     "n_recs": 5,
     "items": "10,20,30,40,50",

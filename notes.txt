@@ -3,6 +3,8 @@ docker rm rec-service_rec-server_1
 docker image rm rec-server
 
 docker build -t rec-server .
+docker run -d -p 5000:5000 rec-server
+
 docker-compose up
 docker-compose up --build
 
@@ -48,7 +50,7 @@ gunicorn -w 8 wsgi:app
 gunicorn --bind 0.0.0.0:5000 -w 4 wsgi:app
 
 # 4 workers, debug mode and min timeout
-gunicorn -w 4 wsgi:app --log-level=debug -t 2400
+gunicorn -b 0.0.0.0:5000 -w 4 wsgi:app --log-level=debug -t 2400
 
 http://127.0.0.1:8000/recommendations?user_id=2038&num_recs=10
 

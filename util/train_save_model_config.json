@@ -16,5 +16,5 @@
     "create_memory_optimized_models": false,
     "from_data_files": true,
     "upload_models": true,
-    "rec_server_baese_url": "http://127.0.0.1:8000/"
+    "rec_server_baese_url": "http://127.0.0.1:5000/"
 }
