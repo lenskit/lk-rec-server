@@ -17,5 +17,5 @@
     "from_data_files": true,
     "upload_models": true,
     "rec_server_baese_url": "http://127.0.0.1:5000/",
-    "algorithms": ["popular"]
+    "algorithms": ["popular","bias","itemitem","useruser","biasedmf","implicitmf","funksvd"]
 }

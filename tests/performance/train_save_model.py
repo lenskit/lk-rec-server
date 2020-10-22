@@ -5,7 +5,7 @@ import json
 import logging
 from sqlalchemy import create_engine
 from pandas.io import sql
-from lenskit.algorithms import basic, als, Predictor, Recommender
+from lenskit.algorithms import basic, als
 import lenskit.algorithms.item_knn as iknn
 import lenskit.algorithms.user_knn as uknn
 import lenskit.algorithms.funksvd as svd
@@ -13,6 +13,7 @@ from lenskit.algorithms.implicit import BPR
 from pathlib import Path
 from binpickle import dump
 from lenskit.sharing import sharing_mode
+import requests
 
 def get_value(key):
     with open('train_save_model_config.json') as json_data_file:
@@ -33,7 +34,7 @@ def get_ratings_from_db():
         password=db_connection['password'],
         server=db_connection['server'])
     db_name = db_connection['database']
-    return sql.read_sql("SELECT userId as user, itemId as item, rating, timestamp FROM ratings;", create_engine(f"{conn_string}/{db_name}?port={db_connection['port']}"))
+    return sql.read_sql("SELECT user, item, rating, timestamp FROM rating;", create_engine(f"{conn_string}/{db_name}?port={db_connection['port']}"))
 
 def get_algo_class(algo):
     if algo == 'popular':
@@ -72,12 +73,17 @@ def get_topn_algo_class(algo):
         return basic.TopN(BPR(25))
 
 def create_model(algo, ratings):
-    algo_class = get_algo_class(algo)
+    create_top_n_models = get_value("create_top_n_models")
+    if create_top_n_models:
+        algo_class = get_topn_algo_class(algo)
+    else:
+        algo_class = get_algo_class(algo)
+
     if algo_class != None:
         algo_class.fit(ratings)
         return algo_class
 
-def store(data, file_name, sharingmode=True):
+def store(data, file_name):
     models_folder_path = get_value("models_folder_path")
     full_file_name = Path(models_folder_path) / file_name
 
@@ -87,13 +93,26 @@ def store(data, file_name, sharingmode=True):
     if not os.path.exists(models_folder_path):
         os.makedirs(models_folder_path)
 
+    sharingmode = get_value("create_memory_optimized_models")
     if sharingmode:
         with sharing_mode():
             dump(data, full_file_name, mappable=True)
     else:
         dump(data, full_file_name)
 
-def save_models(algos, overwrite=False, from_data_files=True):
+def upload_model(algo):
+    rec_server_baese_url = get_value("rec_server_baese_url")
+    right_url = f'algorithms/{algo}/modelfile'
+    model_name = algo + ".bpk"
+    file_path = get_value("models_folder_path") + model_name
+    files = {
+        'file': open(file_path, 'rb')
+    }
+    response = requests.put(rec_server_baese_url + right_url, files=files)
+    return response
+
+def save_models(algos):
+    from_data_files = get_value("from_data_files") == True
     if from_data_files:
         print('Getting data from file')
         ratings = get_ratings_from_file()
@@ -101,16 +120,19 @@ def save_models(algos, overwrite=False, from_data_files=True):
         print('Getting data from db')
         ratings = get_ratings_from_db()
 
-    for algo in algos.split(','):
+    for algo in algos:
         algo = algo.strip()
-        full_file_name = Path(get_value("models_folder_path") + algo + ".bpk")
-        if full_file_name.exists() and not overwrite:
-            print(f'Model already exists for {algo}. Skipping model creation.')
+        print(f'Creating model for {algo}')
+        model = create_model(algo, ratings)
+        if model != None:
+            store(model, algo + ".bpk")
+            print(f'Model {algo} saved successfully')
         else:
-            print(f'Creating model for {algo}')
-            model = create_model(algo, ratings)
-            if model != None:
-                store(model, algo + ".bpk", False)
-                print(f'Model {algo} saved successfully')
-            else:
-                print(f'Algorithm {algo} not found')
+            print(f'Algorithm {algo} not found')
+    
+    if get_value("upload_models"):
+        print('Uploading models')
+        for algo in algos:
+            algo = algo.strip()
+            print(f'Uploading model for {algo}')
+            upload_model(algo)

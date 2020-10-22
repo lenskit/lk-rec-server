@@ -131,11 +131,12 @@ def save_models():
         else:
             print(f'Algorithm {algo} not found')
 
-    print('Uploading models')
-    for algo in algos:
-        algo = algo.strip()
-        print(f'Uploading model for {algo}')
-        upload_model(algo)            
+    if get_value("upload_models"):
+        print('Uploading models')
+        for algo in algos:
+            algo = algo.strip()
+            print(f'Uploading model for {algo}')
+            upload_model(algo)
 
 if __name__ == "__main__":
     save_models()

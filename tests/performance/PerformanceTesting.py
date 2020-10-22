@@ -11,7 +11,7 @@
 # %pip install psycopg2
 
 
-# In[2]:
+# In[17]:
 
 
 import asyncio
@@ -28,13 +28,13 @@ from time import perf_counter
 # import matplotlib.pyplot as plt
 # import seaborn as sns
 import pandas as pd
-import nest_asyncio
-nest_asyncio.apply()
+# import nest_asyncio
+# nest_asyncio.apply()
 
 
 # # Performance Testing
 
-# In[35]:
+# In[5]:
 
 
 class ConfigReader:
@@ -44,7 +44,7 @@ class ConfigReader:
         return data[key]
 
 
-# In[4]:
+# In[6]:
 
 
 class DbManager:
@@ -71,7 +71,7 @@ class DbManager:
 
 # ### Semaphore performance
 
-# In[41]:
+# In[7]:
 
 
 import os
@@ -173,7 +173,7 @@ async def get_user_recs_sem(user, algo, n_recs, session, times):
 
 # ### Gunicorn methods
 
-# In[45]:
+# In[8]:
 
 
 import subprocess
@@ -203,10 +203,11 @@ def remove_workers(n):
 
 # ### Get random users
 
-# In[55]:
+# In[9]:
 
 
-n_rand_users = num_requests = ConfigReader().get_value("num_requests")
+reader = ConfigReader()
+n_rand_users = num_requests = reader.get_value("num_requests")
 dbManager = DbManager()
 db_users = dbManager.get_users()
 n_rand_users = db_users.sample(n=n_rand_users)
@@ -214,10 +215,9 @@ n_rand_users = db_users.sample(n=n_rand_users)
 
 # ### Get config values
 
-# In[56]:
+# In[10]:
 
 
-reader = ConfigReader()
 base_url = reader.get_value("rec_server_baese_url")
 n_recs = reader.get_value("n_recs")
 items = reader.get_value("items")
@@ -227,7 +227,7 @@ rec_algos = reader.get_value("rec_algos")
 
 # ### Warm up phase
 
-# In[57]:
+# In[19]:
 
 
 async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
@@ -245,7 +245,7 @@ async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
         responses = await asyncio.gather(*tasks)
 
 
-# In[58]:
+# In[20]:
 
 
 def warm_up(current_algo=None, num_workers=24, display_logs=True):
@@ -254,7 +254,7 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
     loop.run_until_complete(future)
 
 
-# In[59]:
+# In[21]:
 
 
 warm_up(None, 4)
@@ -264,7 +264,7 @@ warm_up(None, 4)
 
 # #### Predictions for different algorithms
 
-# In[60]:
+# In[12]:
 
 
 for algo in pred_algos:
@@ -281,7 +281,7 @@ for algo in pred_algos:
 
 # #### Recommendations
 
-# In[17]:
+# In[13]:
 
 
 algo_rec = 'popular'
@@ -298,14 +298,14 @@ print('')
 
 # ### Speedup Tests
 
-# In[18]:
+# In[25]:
 
 
 throughputs = []
-linear_speedup_algos = ['biasedmf', 'itemitem']
+linear_speedup_algos = reader.get_value("linear_speedup_algos")
 
 
-# In[19]:
+# In[15]:
 
 
 def call_server(file_name):
@@ -316,15 +316,14 @@ def call_server(file_name):
 #    hist_numbers(file_name)
 
 
-# In[20]:
+# In[16]:
 
 
-reader = ConfigReader()
 workers_config = reader.get_value("workers_config")
 inc_config = reader.get_value("inc_config")
 
 
-# In[23]:
+# In[17]:
 
 
 for current_algo in linear_speedup_algos:
@@ -350,14 +349,14 @@ for current_algo in linear_speedup_algos:
 
 # #### Throughput by number of workers
 
-# In[ ]:
+# In[18]:
 
 
 # throughput_file_name_workers = 'throughput_single_multiple_workers.csv'
 # np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
 
 
-# In[ ]:
+# In[19]:
 
 
 # throughputs_workers_from_file = np.genfromtxt(throughput_file_name_workers, delimiter=',')
@@ -380,7 +379,7 @@ for current_algo in linear_speedup_algos:
 
 # ### Lenskit
 
-# In[24]:
+# In[41]:
 
 
 import sys
@@ -389,7 +388,13 @@ from binpickle import BinPickleFile
 from pathlib import Path
 
 directory_path = 'models'
-algo_pred_lkpy = 'bias.bpk'
+
+def exists_model_file(algo):
+    full_file_name = Path(directory_path) / algo
+    if full_file_name.exists():
+        return True
+    else:
+        return False
 
 def load_for_shared_mem(file_name):
     full_file_name = Path(directory_path) / file_name
@@ -422,7 +427,7 @@ async def get_preds_threads_lkpy(num_sem, model, file_name=None, add_throughput=
 
     async with aiohttp.ClientSession() as session:
         for idx, row in n_rand_users.iterrows():
-            task = asyncio.ensure_future(get_user_preds_with_threads_lkpy(row['user'], algo_pred_lkpy, items, session, sem, times, model))
+            task = asyncio.ensure_future(get_user_preds_with_threads_lkpy(row['user'], items, session, sem, times, model))
             tasks.append(task)         
 
         responses = await asyncio.gather(*tasks)
@@ -438,11 +443,11 @@ async def get_preds_threads_lkpy(num_sem, model, file_name=None, add_throughput=
         if add_throughput:
             throughputs.append(num_requests / time_taken_all)
 
-async def get_user_preds_with_threads_lkpy(user, algo, items, session, sem, times, model):
+async def get_user_preds_with_threads_lkpy(user, items, session, sem, times, model):
     async with sem:  # semaphore limits num of simultaneous downloads
-        return await get_user_preds_threads_lkpy(user, algo, items, session, times, model)        
+        return await get_user_preds_threads_lkpy(user, items, session, times, model)        
         
-async def get_user_preds_threads_lkpy(user, algo, items, session, times, model):
+async def get_user_preds_threads_lkpy(user, items, session, times, model):
     try:
         start = perf_counter()
         results = []
@@ -461,18 +466,22 @@ async def get_user_preds_threads_lkpy(user, algo, items, session, times, model):
 
 # #### Train models
 
-# In[29]:
+# In[42]:
 
 
 import train_save_model
-algos = "bias, biasedmf" #, itemitem"
-train_save_model.save_models(algos)
+lk_recserver_algos = reader.get_value('lk_recserver_algos')
+lk_recserver_algos_not_created = []
+for a in lk_recserver_algos:
+    if not exists_model_file(f'{a}.bpk'):
+        lk_recserver_algos_not_created.append(a)
+if len(lk_recserver_algos_not_created) > 0:
+    train_save_model.save_models(lk_recserver_algos_not_created)
 
 
-# In[30]:
+# In[35]:
 
 
-lk_recserver_algos = ['bias', 'biasedmf'] #, 'itemitem']
 for lk_recserver_algo in lk_recserver_algos:
     print(f'Algo: {lk_recserver_algo}')
     print('Lenskit performance:')
@@ -484,15 +493,21 @@ for lk_recserver_algo in lk_recserver_algos:
     #plot_numbers(file_name)
     #hist_numbers(file_name)
     print('------------------')    
-    warm_up(algo, 8, False)
+    warm_up(lk_recserver_algo, 8, False)
     print('Recommendation server performance:')
     file_name = f'preds_{lk_recserver_algo}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'
     loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(get_preds_sem(8, algo, file_name, True))
+    future = asyncio.ensure_future(get_preds_sem(8, lk_recserver_algo, file_name, True))
     loop.run_until_complete(future)
     #plot_numbers(file_name)
     #hist_numbers(file_name)
     print('*******************************************************')    
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
