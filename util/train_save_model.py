@@ -111,7 +111,8 @@ def upload_model(algo):
     response = requests.put(rec_server_baese_url + right_url, files=files)
     return response
 
-def save_models(algos):
+def save_models():
+    algos = get_value("algorithms") 
     from_data_files = get_value("from_data_files") == True
     if from_data_files:
         print('Getting data from file')
@@ -120,7 +121,7 @@ def save_models(algos):
         print('Getting data from db')
         ratings = get_ratings_from_db()
 
-    for algo in algos.split(','):
+    for algo in algos:
         algo = algo.strip()
         print(f'Creating model for {algo}')
         model = create_model(algo, ratings)
@@ -131,10 +132,10 @@ def save_models(algos):
             print(f'Algorithm {algo} not found')
 
     print('Uploading models')
-    for algo in algos.split(','):
+    for algo in algos:
         algo = algo.strip()
         print(f'Uploading model for {algo}')
         upload_model(algo)            
 
 if __name__ == "__main__":
-    save_models(sys.argv[1])
+    save_models()

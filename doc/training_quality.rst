@@ -4,12 +4,11 @@ Training & quality check process
 How to create the model files
 ===============================
 The script train_save_model.py located in the util folder is used to create the model files. You can simply call it like this:
-    python train_save_model.py algos from_data_files
-Where:
-    algos are the name of the algorithms separated by commas.
+    python train_save_model.py
 
-A usage example could be:
-    python train_save_model.py popular,bias,itemitem,useruser,biasedmf,implicitmf,funksvd,bpr
+You need to change the file train_save_model_config.json to reflect your configuration. 
+You can configure the database connection string, the recommendation server url, how to create the models, the algorithms to create models for, and other parameters.
+
 
 The configuration for the script is defined in train_save_model_config.json. The different keys are:
     data_folder_path: It specifies the folder where the data file is.
