@@ -112,24 +112,25 @@ def upload_model(algo):
     return response
 
 def save_models():
-    algos = get_value("algorithms") 
-    from_data_files = get_value("from_data_files") == True
-    if from_data_files:
-        print('Getting data from file')
-        ratings = get_ratings_from_file()
-    else:
-        print('Getting data from db')
-        ratings = get_ratings_from_db()
-
-    for algo in algos:
-        algo = algo.strip()
-        print(f'Creating model for {algo}')
-        model = create_model(algo, ratings)
-        if model != None:
-            store(model, algo + ".bpk")
-            print(f'Model {algo} saved successfully')
+    algos = get_value("algorithms")
+    if get_value("create_models"):
+        from_data_files = get_value("from_data_files") == True
+        if from_data_files:
+            print('Getting data from file')
+            ratings = get_ratings_from_file()
         else:
-            print(f'Algorithm {algo} not found')
+            print('Getting data from db')
+            ratings = get_ratings_from_db()
+
+        for algo in algos:
+            algo = algo.strip()
+            print(f'Creating model for {algo}')
+            model = create_model(algo, ratings)
+            if model != None:
+                store(model, algo + ".bpk")
+                print(f'Model {algo} saved successfully')
+            else:
+                print(f'Algorithm {algo} not found')
 
     if get_value("upload_models"):
         print('Uploading models')
