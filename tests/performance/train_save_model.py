@@ -10,6 +10,7 @@ import lenskit.algorithms.item_knn as iknn
 import lenskit.algorithms.user_knn as uknn
 import lenskit.algorithms.funksvd as svd
 from lenskit.algorithms.implicit import BPR
+from lenskit.algorithms import tf as lktf
 from pathlib import Path
 from binpickle import dump
 from lenskit.sharing import sharing_mode
@@ -53,6 +54,8 @@ def get_algo_class(algo):
         return als.ImplicitMF(20, iterations=10)
     elif algo == 'funksvd':
         return svd.FunkSVD(20, iterations=20)
+    elif algo == 'tf_bpr':
+        return lktf.BPR(20, batch_size=1024, epochs=20, neg_count=2, rng_spec=42)        
 
 def get_topn_algo_class(algo):
     if algo == 'popular':
