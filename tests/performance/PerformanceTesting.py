@@ -28,6 +28,8 @@ from time import perf_counter
 # import matplotlib.pyplot as plt
 # import seaborn as sns
 import pandas as pd
+import os
+import pickle
 # import nest_asyncio
 # nest_asyncio.apply()
 
@@ -62,9 +64,9 @@ class DbManager:
 
     def get_users(self):
         # postgres:
-#        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
+        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
         # mysql:
-       return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
+#        return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
 
 
 # ## Test prediction and recommendation endpoints
@@ -74,7 +76,6 @@ class DbManager:
 # In[5]:
 
 
-import os
 throughputs = []
 
 def print_stats(times, time_taken_all, num_requests):
@@ -84,13 +85,29 @@ def print_stats(times, time_taken_all, num_requests):
     print(f'Mean response time: {round(np.mean(times), 3)}')
     print(f'99 percentile: {round(np.quantile(times, 0.99), 3)}')
 
+def print_stats_from_file(file_name):
+    obj = pickle.load(open(file_name, "rb"))  
+    times = obj['times']
+    time_taken_all = obj['time_taken_all']
+    num_requests = obj['num_requests']
+    print(f'Number of requests: {num_requests}')    
+    print(f'Total response time: {round(time_taken_all, 3)}')
+    print(f'Throughput (requests per second): {round(num_requests / time_taken_all, 3)}')
+    print(f'Peak response time: {round(max(times), 3)}')
+    print(f'Mean response time: {round(np.mean(times), 3)}')
+    print(f'99 percentile: {round(np.quantile(times, 0.99), 3)}')    
+    
 def plot_numbers(file_name):
-    resp_time_per_request = np.genfromtxt(file_name, delimiter=',')
+    #resp_time_per_request = np.genfromtxt(file_name, delimiter=',')
+    obj = pickle.load(open(file_name, "rb"))
+    resp_time_per_request = obj['times']
     plt.plot(resp_time_per_request)
     plt.show()
     
 def hist_numbers(file_name):
-    resp_time_per_request = np.genfromtxt(file_name, delimiter=',')
+#    resp_time_per_request = np.genfromtxt(file_name, delimiter=',')
+    obj = pickle.load(open(file_name, "rb"))    
+    resp_time_per_request = obj['times']
     plt.hist(resp_time_per_request, bins='auto')
     plt.show()
 
@@ -115,7 +132,9 @@ async def get_preds_sem(num_sem, algo_pred, file_name=None, add_throughput=False
         if file_name != None and file_name != '':
             if os.path.exists(file_name):
                 os.remove(file_name)
-            np.savetxt(file_name, times, delimiter=',')
+            obj = {'times': times, 'time_taken_all': time_taken_all, 'num_requests': num_requests}
+            pickle.dump(obj, open(file_name, "wb"))
+#            np.savetxt(file_name, times, delimiter=',')
         
         if add_throughput:
             throughputs.append(num_requests / time_taken_all)
@@ -153,7 +172,9 @@ async def get_recs_sem(num_sem, algo_rec, file_name=None, add_throughput=False):
         if file_name != None and file_name != '':
             if os.path.exists(file_name):
                 os.remove(file_name)
-            np.savetxt(file_name, times, delimiter=',')
+#            np.savetxt(file_name, times, delimiter=',')
+            obj = {'times': times, 'time_taken_all': time_taken_all, 'num_requests': num_requests}
+            pickle.dump(obj, open(file_name, "wb"))
         
         if add_throughput:
             throughputs.append(num_requests / time_taken_all)
@@ -268,13 +289,11 @@ warm_up(None, 4)
 
 
 for algo in pred_algos:
-    file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.csv'
+    file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.pickle'
     loop = asyncio.get_event_loop()
     print(f'Algorithm: {algo}')
     future = asyncio.ensure_future(get_preds_sem(8, algo, file_name, True))
     loop.run_until_complete(future)
-#    plot_numbers(file_name)
-#    hist_numbers(file_name)
     print('---------------------')
     print('')
 
@@ -286,7 +305,7 @@ for algo in pred_algos:
 
 algo_rec = 'popular'
 print(f'Algorithm: {algo_rec}')
-file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.csv'
+file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
 loop = asyncio.get_event_loop()
 future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
 loop.run_until_complete(future)
@@ -369,7 +388,7 @@ async def get_user_preds_with_threads_lkpy(user, items, session, sem, times, mod
 async def get_user_preds_threads_lkpy(user, items, session, times, model):
     try:
         start = perf_counter()
-        results = [] 
+        results = []
         df_preds = model.predict_for_user(user, list(map(int, items.split(','))))
         for index, value in df_preds.iteritems():
             if not math.isnan(value):
@@ -398,13 +417,14 @@ if len(lk_recserver_algos_not_created) > 0:
     train_save_model.save_models(lk_recserver_algos_not_created)
 
 
-# In[ ]:
+# In[16]:
+
 
 print('Lenskit performance:')
 for lk_recserver_algo in lk_recserver_algos:
     print(f'Algo: {lk_recserver_algo}')
     model = load_for_shared_mem(f'{lk_recserver_algo}.bpk')
-    file_name = f'lkpy_{lk_recserver_algo}_num_req_{num_requests}.csv'
+    file_name = f'lkpy_{lk_recserver_algo}_num_req_{num_requests}.pickle'
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_threads_lkpy(8, model, file_name))
     loop.run_until_complete(future)
@@ -413,7 +433,7 @@ for lk_recserver_algo in lk_recserver_algos:
     print('------------------')    
     warm_up(lk_recserver_algo, 8, False)
     print('Recommendation server performance:')
-    file_name = f'preds_{lk_recserver_algo}_against_lkpy_workers_4_num_req_{num_requests}.csv'
+    file_name = f'preds_{lk_recserver_algo}_against_lkpy_workers_4_num_req_{num_requests}.pickle'
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_sem(8, lk_recserver_algo, file_name, True))
     loop.run_until_complete(future)
@@ -459,14 +479,14 @@ for current_algo in linear_speedup_algos:
     for num_workers in workers_config:
         print(f'Algo: {current_algo}, Workers: {num_workers}')
         warm_up(current_algo, num_workers, display_logs=False)
-        file_name = f'linear_speedup_preds_{current_algo}_workers_{num_workers}_num_req_{num_requests}.csv'
+        file_name = f'linear_speedup_preds_{current_algo}_workers_{num_workers}_num_req_{num_requests}.pickle'
         call_server(file_name)
         if (num_workers != workers_config[-1]):
             print(f'add {inc_config[i]} workers')
             add_workers(inc_config[i])
         i += 1
         print('------------------')
-    throughput_file_name_workers = f'throughput_single_multiple_workers_algo_{current_algo}.csv'
+    throughput_file_name_workers = f'throughput_single_multiple_workers_algo_{current_algo}.pickle'
     np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
     remove_workers(workers_config[-1] - 4) # remove workers to get only 4 (default config)
     print('*******************************************************')
@@ -478,7 +498,7 @@ for current_algo in linear_speedup_algos:
 # In[ ]:
 
 
-# throughput_file_name_workers = 'throughput_single_multiple_workers.csv'
+# throughput_file_name_workers = 'throughput_single_multiple_workers.pickle'
 # np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
 
 
@@ -509,15 +529,36 @@ for current_algo in linear_speedup_algos:
 
 # #### Predictions for different algorithms
 
-# In[ ]:
+# In[17]:
 
 
 # for algo in pred_algos:
-#     file_name = f'preds_{algo}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'  
-#     plot_numbers(file_name)
+#     print(f'Algorithm: {algo}')
+#     file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.pickle'  
+#     print_stats_from_file(file_name)
 #     hist_numbers(file_name)
 #     print('---------------------')
 #     print('')
+
+
+# #### Recommendations
+
+# In[18]:
+
+
+# algo_rec = 'popular'
+# print(f'Algorithm: {algo_rec}')
+# file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
+# print_stats_from_file(file_name)
+# hist_numbers(file_name)
+# print('---------------------')
+# print('')
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
