@@ -8,9 +8,7 @@ To start using the recommendation server we need to follow some steps:
 5) Start gunicorn. For instance, you can start it with 4 workers using the default port by running: gunicorn -w 4 wsgi:app
 6) Place the model files inside the /models folder manually or by using the endpoint '/algorithms/<algo>/modelfile'
 
-Deployment
-=========================
-You can easily create a docker image for the recommendation server by using the Dockerfile at the root of the project.
+You can easily create a docker image for the recommendation server by using the Dockerfile at the root of the project. For more information read the Deployment guide.
 
 Testing
 =========================
