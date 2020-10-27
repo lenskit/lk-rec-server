@@ -55,7 +55,7 @@ def get_algo_class(algo):
     elif algo == 'funksvd':
         return svd.FunkSVD(20, iterations=20)
     elif algo == 'tf_bpr':
-        return lktf.BPR(20, batch_size=1024, epochs=20, neg_count=2, rng_spec=42)        
+        return lktf.BPR(20, batch_size=1024, epochs=5, neg_count=2, rng_spec=42)        
 
 def get_topn_algo_class(algo):
     if algo == 'popular':

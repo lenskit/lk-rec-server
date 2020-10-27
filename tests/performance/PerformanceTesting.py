@@ -11,7 +11,7 @@
 # %pip install psycopg2
 
 
-# In[17]:
+# In[2]:
 
 
 import asyncio
@@ -34,7 +34,7 @@ import pandas as pd
 
 # # Performance Testing
 
-# In[5]:
+# In[3]:
 
 
 class ConfigReader:
@@ -44,7 +44,7 @@ class ConfigReader:
         return data[key]
 
 
-# In[6]:
+# In[4]:
 
 
 class DbManager:
@@ -64,14 +64,14 @@ class DbManager:
         # postgres:
 #        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
         # mysql:
-        return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
+       return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
 
 
-# ## Test recommendation endpoint
+# ## Test prediction and recommendation endpoints
 
-# ### Semaphore performance
+# ### Prediction and recommendations methods with semaphore
 
-# In[7]:
+# In[5]:
 
 
 import os
@@ -173,7 +173,7 @@ async def get_user_recs_sem(user, algo, n_recs, session, times):
 
 # ### Gunicorn methods
 
-# In[8]:
+# In[6]:
 
 
 import subprocess
@@ -193,17 +193,17 @@ def get_gunicorn_master_pid():
 def add_workers(n):
     master_id = get_gunicorn_master_pid()
     for i in range(n):
-        os.system(f"kill -s TTIN {master_id}")
+        os.system(f"sudo kill -s TTIN {master_id}")
         
 def remove_workers(n):
     master_id = get_gunicorn_master_pid()
     for i in range(n):
-        os.system(f"kill -s TTOU {master_id}")    
+        os.system(f"sudo kill -s TTOU {master_id}")    
 
 
 # ### Get random users
 
-# In[9]:
+# In[7]:
 
 
 reader = ConfigReader()
@@ -215,7 +215,7 @@ n_rand_users = db_users.sample(n=n_rand_users)
 
 # ### Get config values
 
-# In[10]:
+# In[8]:
 
 
 base_url = reader.get_value("rec_server_baese_url")
@@ -227,7 +227,7 @@ rec_algos = reader.get_value("rec_algos")
 
 # ### Warm up phase
 
-# In[19]:
+# In[9]:
 
 
 async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
@@ -245,7 +245,7 @@ async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
         responses = await asyncio.gather(*tasks)
 
 
-# In[20]:
+# In[10]:
 
 
 def warm_up(current_algo=None, num_workers=24, display_logs=True):
@@ -254,13 +254,13 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
     loop.run_until_complete(future)
 
 
-# In[21]:
+# In[11]:
 
 
 warm_up(None, 4)
 
 
-# ### Call predict and recommend from server for canonical config
+# ### Call predict and recommend endpoints from server for canonical config
 
 # #### Predictions for different algorithms
 
@@ -268,7 +268,7 @@ warm_up(None, 4)
 
 
 for algo in pred_algos:
-    file_name = f'preds_{algo}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'
+    file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.csv'
     loop = asyncio.get_event_loop()
     print(f'Algorithm: {algo}')
     future = asyncio.ensure_future(get_preds_sem(8, algo, file_name, True))
@@ -286,7 +286,7 @@ for algo in pred_algos:
 
 algo_rec = 'popular'
 print(f'Algorithm: {algo_rec}')
-file_name = f'recs_{algo_rec}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'
+file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.csv'
 loop = asyncio.get_event_loop()
 future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
 loop.run_until_complete(future)
@@ -296,90 +296,9 @@ print('')
 #hist_numbers(file_name)
 
 
-# ### Speedup Tests
-
-# In[25]:
-
-
-throughputs = []
-linear_speedup_algos = reader.get_value("linear_speedup_algos")
-
-
-# In[15]:
-
-
-def call_server(file_name):
-    loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(get_preds_sem(8, current_algo, file_name, True))
-    loop.run_until_complete(future)
-#    plot_numbers(file_name)
-#    hist_numbers(file_name)
-
-
-# In[16]:
-
-
-workers_config = reader.get_value("workers_config")
-inc_config = reader.get_value("inc_config")
-
-
-# In[17]:
-
-
-for current_algo in linear_speedup_algos:
-    i = 0
-    throughputs = []
-    remove_workers(3) # reduce from 4 workers to 1
-    for num_workers in workers_config:
-        print(f'Algo: {current_algo}, Workers: {num_workers}')
-        warm_up(current_algo, num_workers, display_logs=False)
-        file_name = f'preds_{current_algo}_parallel_threads_8_workers_{num_workers}_num_req_{num_requests}.csv'
-        call_server(file_name)
-        if (num_workers != workers_config[-1]):
-            print(f'add {inc_config[i]} workers')
-            add_workers(inc_config[i])
-        i += 1
-        print('------------------')
-    throughput_file_name_workers = f'throughput_single_multiple_workers_algo_{current_algo}.csv'
-    np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
-    remove_workers(workers_config[-1] - 4) # remove workers to get only 4 (default config)
-    print('*******************************************************')
-    
-
-
-# #### Throughput by number of workers
-
-# In[18]:
-
-
-# throughput_file_name_workers = 'throughput_single_multiple_workers.csv'
-# np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
-
-
-# In[19]:
-
-
-# throughputs_workers_from_file = np.genfromtxt(throughput_file_name_workers, delimiter=',')
-# workers = [1, 2, 4, 8, 16]
-# y_pos = np.arange(len(throughputs_workers_from_file))
-
-# plt.bar(y_pos, throughputs_workers_from_file, align='center', alpha=0.5)
-# plt.xticks(y_pos, workers)
-# plt.ylabel('Throughput')
-# plt.title('Throughput by workers')
-
-# plt.show()
-
-
-# In[ ]:
-
-
-
-
-
 # ### Lenskit
 
-# In[41]:
+# In[14]:
 
 
 import sys
@@ -450,8 +369,8 @@ async def get_user_preds_with_threads_lkpy(user, items, session, sem, times, mod
 async def get_user_preds_threads_lkpy(user, items, session, times, model):
     try:
         start = perf_counter()
-        results = []
-        df_preds = model.predict_for_user(user, items.split(','))
+        results = [] 
+        df_preds = model.predict_for_user(user, list(map(int, items.split(','))))
         for index, value in df_preds.iteritems():
             if not math.isnan(value):
                 results.append({'item': index, 'score': value})
@@ -466,7 +385,7 @@ async def get_user_preds_threads_lkpy(user, items, session, times, model):
 
 # #### Train models
 
-# In[42]:
+# In[15]:
 
 
 import train_save_model
@@ -479,14 +398,13 @@ if len(lk_recserver_algos_not_created) > 0:
     train_save_model.save_models(lk_recserver_algos_not_created)
 
 
-# In[35]:
+# In[ ]:
 
-
+print('Lenskit performance:')
 for lk_recserver_algo in lk_recserver_algos:
     print(f'Algo: {lk_recserver_algo}')
-    print('Lenskit performance:')
     model = load_for_shared_mem(f'{lk_recserver_algo}.bpk')
-    file_name = f'lkpy_parallel_threads_8_{lk_recserver_algo}__num_req_{num_requests}.csv'
+    file_name = f'lkpy_{lk_recserver_algo}_num_req_{num_requests}.csv'
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_threads_lkpy(8, model, file_name))
     loop.run_until_complete(future)
@@ -495,13 +413,111 @@ for lk_recserver_algo in lk_recserver_algos:
     print('------------------')    
     warm_up(lk_recserver_algo, 8, False)
     print('Recommendation server performance:')
-    file_name = f'preds_{lk_recserver_algo}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'
+    file_name = f'preds_{lk_recserver_algo}_against_lkpy_workers_4_num_req_{num_requests}.csv'
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_sem(8, lk_recserver_algo, file_name, True))
     loop.run_until_complete(future)
     #plot_numbers(file_name)
     #hist_numbers(file_name)
     print('*******************************************************')    
+
+
+# ### Speedup Tests
+
+# In[ ]:
+
+
+throughputs = []
+linear_speedup_algos = reader.get_value("linear_speedup_algos")
+
+
+# In[ ]:
+
+
+def call_server(file_name):
+    loop = asyncio.get_event_loop()
+    future = asyncio.ensure_future(get_preds_sem(8, current_algo, file_name, True))
+    loop.run_until_complete(future)
+#    plot_numbers(file_name)
+#    hist_numbers(file_name)
+
+
+# In[ ]:
+
+
+workers_config = reader.get_value("workers_config")
+inc_config = reader.get_value("inc_config")
+
+
+# In[ ]:
+
+
+for current_algo in linear_speedup_algos:
+    i = 0
+    throughputs = []
+    remove_workers(3) # reduce from 4 workers to 1
+    for num_workers in workers_config:
+        print(f'Algo: {current_algo}, Workers: {num_workers}')
+        warm_up(current_algo, num_workers, display_logs=False)
+        file_name = f'linear_speedup_preds_{current_algo}_workers_{num_workers}_num_req_{num_requests}.csv'
+        call_server(file_name)
+        if (num_workers != workers_config[-1]):
+            print(f'add {inc_config[i]} workers')
+            add_workers(inc_config[i])
+        i += 1
+        print('------------------')
+    throughput_file_name_workers = f'throughput_single_multiple_workers_algo_{current_algo}.csv'
+    np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
+    remove_workers(workers_config[-1] - 4) # remove workers to get only 4 (default config)
+    print('*******************************************************')
+    
+
+
+# #### Throughput by number of workers
+
+# In[ ]:
+
+
+# throughput_file_name_workers = 'throughput_single_multiple_workers.csv'
+# np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
+
+
+# In[ ]:
+
+
+# throughputs_workers_from_file = np.genfromtxt(throughput_file_name_workers, delimiter=',')
+# workers = [1, 2, 4, 8, 16]
+# y_pos = np.arange(len(throughputs_workers_from_file))
+
+# plt.bar(y_pos, throughputs_workers_from_file, align='center', alpha=0.5)
+# plt.xticks(y_pos, workers)
+# plt.ylabel('Throughput')
+# plt.title('Throughput by workers')
+
+# plt.show()
+
+
+# In[ ]:
+
+
+
+
+
+# ## Show results
+
+# ### Predict and recommend endpoints from server for canonical config
+
+# #### Predictions for different algorithms
+
+# In[ ]:
+
+
+# for algo in pred_algos:
+#     file_name = f'preds_{algo}_parallel_threads_8_workers_4_num_req_{num_requests}.csv'  
+#     plot_numbers(file_name)
+#     hist_numbers(file_name)
+#     print('---------------------')
+#     print('')
 
 
 # In[ ]:
