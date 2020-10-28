@@ -222,28 +222,28 @@ def remove_workers(n):
         os.system(f"sudo kill -s TTOU {master_id}")    
 
 
-# ### Get random users
+# ### Get config values
 
 # In[7]:
 
 
 reader = ConfigReader()
 n_rand_users = num_requests = reader.get_value("num_requests")
-dbManager = DbManager()
-db_users = dbManager.get_users()
-n_rand_users = db_users.sample(n=n_rand_users)
-
-
-# ### Get config values
-
-# In[8]:
-
-
-base_url = reader.get_value("rec_server_baese_url")
+base_url = reader.get_value("rec_server_base_url")
 n_recs = reader.get_value("n_recs")
 items = reader.get_value("items")
 pred_algos = reader.get_value("pred_algos")
 rec_algos = reader.get_value("rec_algos")
+
+
+# ### Get random users
+
+# In[8]:
+
+
+dbManager = DbManager()
+db_users = dbManager.get_users()
+n_rand_users = db_users.sample(n=n_rand_users)
 
 
 # ### Warm up phase
@@ -375,8 +375,10 @@ async def get_preds_threads_lkpy(num_sem, model, file_name=None, add_throughput=
         if file_name != None and file_name != '':
             if os.path.exists(file_name):
                 os.remove(file_name)
-            np.asarray(times)
-            np.savetxt(file_name, times, delimiter=',')
+#             np.asarray(times)
+#             np.savetxt(file_name, times, delimiter=',')
+            obj = {'times': times, 'time_taken_all': time_taken_all, 'num_requests': num_requests}
+            pickle.dump(obj, open(file_name, "wb"))
         
         if add_throughput:
             throughputs.append(num_requests / time_taken_all)
@@ -444,14 +446,14 @@ for lk_recserver_algo in lk_recserver_algos:
 
 # ### Speedup Tests
 
-# In[ ]:
+# In[17]:
 
 
 throughputs = []
 linear_speedup_algos = reader.get_value("linear_speedup_algos")
 
 
-# In[ ]:
+# In[18]:
 
 
 def call_server(file_name):
@@ -462,14 +464,14 @@ def call_server(file_name):
 #    hist_numbers(file_name)
 
 
-# In[ ]:
+# In[19]:
 
 
 workers_config = reader.get_value("workers_config")
 inc_config = reader.get_value("inc_config")
 
 
-# In[ ]:
+# In[20]:
 
 
 for current_algo in linear_speedup_algos:
@@ -486,89 +488,8 @@ for current_algo in linear_speedup_algos:
             add_workers(inc_config[i])
         i += 1
         print('------------------')
-    throughput_file_name_workers = f'throughput_single_multiple_workers_algo_{current_algo}.pickle'
+    throughput_file_name_workers = f'throughput_single_multiple_workers_algo_{current_algo}.csv'
     np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
+
     remove_workers(workers_config[-1] - 4) # remove workers to get only 4 (default config)
     print('*******************************************************')
-    
-
-
-# #### Throughput by number of workers
-
-# In[ ]:
-
-
-# throughput_file_name_workers = 'throughput_single_multiple_workers.pickle'
-# np.savetxt(throughput_file_name_workers, throughputs , delimiter=',')
-
-
-# In[ ]:
-
-
-# throughputs_workers_from_file = np.genfromtxt(throughput_file_name_workers, delimiter=',')
-# workers = [1, 2, 4, 8, 16]
-# y_pos = np.arange(len(throughputs_workers_from_file))
-
-# plt.bar(y_pos, throughputs_workers_from_file, align='center', alpha=0.5)
-# plt.xticks(y_pos, workers)
-# plt.ylabel('Throughput')
-# plt.title('Throughput by workers')
-
-# plt.show()
-
-
-# In[ ]:
-
-
-
-
-
-# ## Show results
-
-# ### Predict and recommend endpoints from server for canonical config
-
-# #### Predictions for different algorithms
-
-# In[17]:
-
-
-# for algo in pred_algos:
-#     print(f'Algorithm: {algo}')
-#     file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.pickle'  
-#     print_stats_from_file(file_name)
-#     hist_numbers(file_name)
-#     print('---------------------')
-#     print('')
-
-
-# #### Recommendations
-
-# In[18]:
-
-
-# algo_rec = 'popular'
-# print(f'Algorithm: {algo_rec}')
-# file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
-# print_stats_from_file(file_name)
-# hist_numbers(file_name)
-# print('---------------------')
-# print('')
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
