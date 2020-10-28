@@ -129,5 +129,19 @@ def recommend_default(results):
     """
     return jsonify({"recommendations": results})
 
+@models.model_method("worst_predictions", Predictor, models.get_worst_predictions_from_model, models.get_preds_params)
+def get_worst_predictions(results):
+    """
+    Get worst predictions using the algorithm, user id and items sent.
+    Args:
+        algo: algorithm to be used.
+        user_id: user id to get predictions for.
+        items: items to get predictions for.
+    Returns:
+        A list of predictions with items and scores.
+    """
+    return jsonify({"predictions": results})
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

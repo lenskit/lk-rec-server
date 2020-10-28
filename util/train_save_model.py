@@ -104,14 +104,14 @@ def store(data, file_name):
         dump(data, full_file_name)
 
 def upload_model(algo):
-    rec_server_baese_url = get_value("rec_server_baese_url")
+    rec_server_base_url = get_value("rec_server_base_url")
     right_url = f'algorithms/{algo}/modelfile'
     model_name = algo + ".bpk"
     file_path = get_value("models_folder_path") + model_name
     files = {
         'file': open(file_path, 'rb')
     }
-    response = requests.put(rec_server_baese_url + right_url, files=files)
+    response = requests.put(rec_server_base_url + right_url, files=files)
     return response
 
 def save_models():

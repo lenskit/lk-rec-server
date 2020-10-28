@@ -2,12 +2,12 @@ Configuration
 ===============
 The main configuration file is config.cfg with the extension .cfg. The things you can configure in this file are:
 
-* DEFAULT_ALGORITHM: it specifies the default algorithm to be used in the recommendation server.
-* DB_CONNECTION: it specifies the different parts of the database connection string.
-* RATING_TABLE_TABLE_NAME: it specifies the rating table name.
-* RATING_TABLE_USER_COLUMN_NAME: it specifies the user column name of the rating table.
-* RATING_TABLE_ITEM_COLUMN_NAME: it specifies the item column name of the rating table.
-* RATING_TABLE_RATING_COLUMN_NAME: it specifies the rating column name of the rating table.
+* DEFAULT_ALGORITHM. It specifies the default algorithm to be used in the recommendation server.
+* DB_CONNECTION. It specifies the different parts of the database connection string.
+* RATING_TABLE_TABLE_NAME. It specifies the rating table name.
+* RATING_TABLE_USER_COLUMN_NAME. It specifies the user column name of the rating table.
+* RATING_TABLE_ITEM_COLUMN_NAME. It specifies the item column name of the rating table.
+* RATING_TABLE_RATING_COLUMN_NAME. It specifies the rating column name of the rating table.
 
 How to extend the recommendation server
 ------------------------------------------

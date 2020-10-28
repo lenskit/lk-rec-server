@@ -1,5 +1,5 @@
 The recommendation server for Lenskit
-====================================
+==========================================
 
 The recommendation server for Lenskit is a web server that exposes LensKit’s recommendation and rating prediction capabilities.
 
@@ -10,8 +10,6 @@ which will itself have end users, and the recommendation server will generate re
 is able to handle multiple concurrent requests and load and reload of recommendation models. It also provides recommendations 
 on demand based on the latest ratings end users have provided. 
 
-Resources
----------
 .. toctree::
     :maxdepth: 2
     :caption: Overview
@@ -19,12 +17,13 @@ Resources
     userguide
     configuration
     deployment
+    training_quality
     endpoints
 
 .. toctree::
     :maxdepth: 2
     :caption: Results
     
-    training_quality
     examples
     accuracy
+    performance

@@ -20,7 +20,7 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'Recommendation Server for LensKit'
+project = 'The recommendation server for LensKit'
 copyright = '2019–2020 Boise State University'
 author = 'Carlos A. Segura Cerna & Michael D. Ekstrand'
 

@@ -14,3 +14,4 @@ tests/functional/test_files/
 doc/data/
 tests/performance/data/
 util/data/
+results/

@@ -63,6 +63,21 @@ class ModelManager:
             logging.error(f"Unexpected preds error for user: {user}, with items: {items}. Error: {sys.exc_info()[0]}")
             raise
 
+    def get_worst_predictions_from_model(self, model, *args):
+        user, items = None, None
+        try:
+            user, items, ratings = args[0][0], args[0][1], args[0][2]
+            results = []
+            df_preds = model.predict_for_user(user, items, ratings)
+            for index, value in df_preds.iteritems():
+                if not math.isnan(value):
+                    results.append({'item': index, 'score': value})
+            results = sorted(results, key = lambda i: i['score'])
+            return results
+        except:
+            logging.error(f"Unexpected preds error for user: {user}, with items: {items}. Error: {sys.exc_info()[0]}")
+            raise
+
     @classmethod
     def get_recommendations_from_default(model, *args):
         return ModelManager.get_recommendations_from_model(model, *args)

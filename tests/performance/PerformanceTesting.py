@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # %pip install aiohttp
@@ -11,7 +11,7 @@
 # %pip install psycopg2
 
 
-# In[2]:
+# In[ ]:
 
 
 import asyncio
@@ -25,18 +25,16 @@ from datetime import datetime
 import numpy as np
 import requests
 from time import perf_counter
-# import matplotlib.pyplot as plt
-# import seaborn as sns
 import pandas as pd
 import os
 import pickle
-# import nest_asyncio
-# nest_asyncio.apply()
+import nest_asyncio
+nest_asyncio.apply()
 
 
 # # Performance Testing
 
-# In[3]:
+# In[ ]:
 
 
 class ConfigReader:
@@ -46,7 +44,7 @@ class ConfigReader:
         return data[key]
 
 
-# In[4]:
+# In[ ]:
 
 
 class DbManager:
@@ -64,16 +62,16 @@ class DbManager:
 
     def get_users(self):
         # postgres:
-        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
+#        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
         # mysql:
-#        return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
+        return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
 
 
 # ## Test prediction and recommendation endpoints
 
 # ### Prediction and recommendations methods with semaphore
 
-# In[5]:
+# In[ ]:
 
 
 throughputs = []
@@ -84,32 +82,6 @@ def print_stats(times, time_taken_all, num_requests):
     print(f'Peak response time: {round(max(times), 3)}')
     print(f'Mean response time: {round(np.mean(times), 3)}')
     print(f'99 percentile: {round(np.quantile(times, 0.99), 3)}')
-
-def print_stats_from_file(file_name):
-    obj = pickle.load(open(file_name, "rb"))  
-    times = obj['times']
-    time_taken_all = obj['time_taken_all']
-    num_requests = obj['num_requests']
-    print(f'Number of requests: {num_requests}')    
-    print(f'Total response time: {round(time_taken_all, 3)}')
-    print(f'Throughput (requests per second): {round(num_requests / time_taken_all, 3)}')
-    print(f'Peak response time: {round(max(times), 3)}')
-    print(f'Mean response time: {round(np.mean(times), 3)}')
-    print(f'99 percentile: {round(np.quantile(times, 0.99), 3)}')    
-    
-def plot_numbers(file_name):
-    #resp_time_per_request = np.genfromtxt(file_name, delimiter=',')
-    obj = pickle.load(open(file_name, "rb"))
-    resp_time_per_request = obj['times']
-    plt.plot(resp_time_per_request)
-    plt.show()
-    
-def hist_numbers(file_name):
-#    resp_time_per_request = np.genfromtxt(file_name, delimiter=',')
-    obj = pickle.load(open(file_name, "rb"))    
-    resp_time_per_request = obj['times']
-    plt.hist(resp_time_per_request, bins='auto')
-    plt.show()
 
 # Predictions    
 async def get_preds_sem(num_sem, algo_pred, file_name=None, add_throughput=False):
@@ -134,7 +106,6 @@ async def get_preds_sem(num_sem, algo_pred, file_name=None, add_throughput=False
                 os.remove(file_name)
             obj = {'times': times, 'time_taken_all': time_taken_all, 'num_requests': num_requests}
             pickle.dump(obj, open(file_name, "wb"))
-#            np.savetxt(file_name, times, delimiter=',')
         
         if add_throughput:
             throughputs.append(num_requests / time_taken_all)
@@ -172,7 +143,6 @@ async def get_recs_sem(num_sem, algo_rec, file_name=None, add_throughput=False):
         if file_name != None and file_name != '':
             if os.path.exists(file_name):
                 os.remove(file_name)
-#            np.savetxt(file_name, times, delimiter=',')
             obj = {'times': times, 'time_taken_all': time_taken_all, 'num_requests': num_requests}
             pickle.dump(obj, open(file_name, "wb"))
         
@@ -194,7 +164,7 @@ async def get_user_recs_sem(user, algo, n_recs, session, times):
 
 # ### Gunicorn methods
 
-# In[6]:
+# In[ ]:
 
 
 import subprocess
@@ -224,7 +194,7 @@ def remove_workers(n):
 
 # ### Get config values
 
-# In[7]:
+# In[ ]:
 
 
 reader = ConfigReader()
@@ -238,7 +208,7 @@ rec_algos = reader.get_value("rec_algos")
 
 # ### Get random users
 
-# In[8]:
+# In[ ]:
 
 
 dbManager = DbManager()
@@ -248,7 +218,7 @@ n_rand_users = db_users.sample(n=n_rand_users)
 
 # ### Warm up phase
 
-# In[9]:
+# In[ ]:
 
 
 async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
@@ -266,7 +236,7 @@ async def warm_up_async(current_algo=None, num_workers=24, display_logs=True):
         responses = await asyncio.gather(*tasks)
 
 
-# In[10]:
+# In[ ]:
 
 
 def warm_up(current_algo=None, num_workers=24, display_logs=True):
@@ -275,7 +245,7 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
     loop.run_until_complete(future)
 
 
-# In[11]:
+# In[ ]:
 
 
 warm_up(None, 4)
@@ -285,7 +255,7 @@ warm_up(None, 4)
 
 # #### Predictions for different algorithms
 
-# In[12]:
+# In[ ]:
 
 
 for algo in pred_algos:
@@ -300,24 +270,22 @@ for algo in pred_algos:
 
 # #### Recommendations
 
-# In[13]:
+# In[ ]:
 
 
-algo_rec = 'popular'
-print(f'Algorithm: {algo_rec}')
-file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
-loop = asyncio.get_event_loop()
-future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
-loop.run_until_complete(future)
-print('---------------------')
-print('')
-#plot_numbers(file_name)
-#hist_numbers(file_name)
+for algo_rec in rec_algos:
+    print(f'Algorithm: {algo_rec}')
+    file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
+    loop = asyncio.get_event_loop()
+    future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
+    loop.run_until_complete(future)
+    print('---------------------')
+    print('')
 
 
 # ### Lenskit
 
-# In[14]:
+# In[ ]:
 
 
 import sys
@@ -375,8 +343,6 @@ async def get_preds_threads_lkpy(num_sem, model, file_name=None, add_throughput=
         if file_name != None and file_name != '':
             if os.path.exists(file_name):
                 os.remove(file_name)
-#             np.asarray(times)
-#             np.savetxt(file_name, times, delimiter=',')
             obj = {'times': times, 'time_taken_all': time_taken_all, 'num_requests': num_requests}
             pickle.dump(obj, open(file_name, "wb"))
         
@@ -406,7 +372,7 @@ async def get_user_preds_threads_lkpy(user, items, session, times, model):
 
 # #### Train models
 
-# In[15]:
+# In[ ]:
 
 
 import train_save_model
@@ -419,7 +385,7 @@ if len(lk_recserver_algos_not_created) > 0:
     train_save_model.save_models(lk_recserver_algos_not_created)
 
 
-# In[16]:
+# In[ ]:
 
 
 print('Lenskit performance:')
@@ -430,8 +396,6 @@ for lk_recserver_algo in lk_recserver_algos:
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_threads_lkpy(8, model, file_name))
     loop.run_until_complete(future)
-    #plot_numbers(file_name)
-    #hist_numbers(file_name)
     print('------------------')    
     warm_up(lk_recserver_algo, 8, False)
     print('Recommendation server performance:')
@@ -439,39 +403,35 @@ for lk_recserver_algo in lk_recserver_algos:
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_sem(8, lk_recserver_algo, file_name, True))
     loop.run_until_complete(future)
-    #plot_numbers(file_name)
-    #hist_numbers(file_name)
     print('*******************************************************')    
 
 
 # ### Speedup Tests
 
-# In[17]:
+# In[ ]:
 
 
 throughputs = []
 linear_speedup_algos = reader.get_value("linear_speedup_algos")
 
 
-# In[18]:
+# In[ ]:
 
 
 def call_server(file_name):
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_preds_sem(8, current_algo, file_name, True))
     loop.run_until_complete(future)
-#    plot_numbers(file_name)
-#    hist_numbers(file_name)
 
 
-# In[19]:
+# In[ ]:
 
 
 workers_config = reader.get_value("workers_config")
 inc_config = reader.get_value("inc_config")
 
 
-# In[20]:
+# In[ ]:
 
 
 for current_algo in linear_speedup_algos:
@@ -493,3 +453,11 @@ for current_algo in linear_speedup_algos:
 
     remove_workers(workers_config[-1] - 4) # remove workers to get only 4 (default config)
     print('*******************************************************')
+    
+
+
+# In[ ]:
+
+
+
+
