@@ -1,6 +1,7 @@
 Get up and running guide
 =========================
 To start using the recommendation server we need to follow some steps:
+
 1) Create your model files by using util/train_save_model.py script. You need to have the ratings in your database or in a file. You can configure the database connection, folder paths and file names on util/train_save_model_config.json
 2) As an optional step, you can create a python virtual environment or an anaconda environment.
 3) Install the python dependencies by executing pip install -r requirements.txt
