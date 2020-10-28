@@ -11,6 +11,6 @@ To start using the recommendation server we need to follow some steps:
 You can easily create a docker image for the recommendation server by using the Dockerfile at the root of the project. For more information read the Deployment guide.
 
 Testing
-=========================
+---------
 You can execute the functional tests by creating a docker environment. We use pytest-docker, so you only need to execute pytest in the command line. The whole docker machines (recommendation server and database) will be created for you. You only need to place your items.csv and ratings.csv in test_db folder. 
 

@@ -1,8 +1,8 @@
 Training & quality check process
-=====================================
+==================================
 
 How to create the model files
-===============================
+-------------------------------
 The script train_save_model.py located in the util folder is used to create the model files. You can simply call it like this:
     python train_save_model.py
 
@@ -20,7 +20,7 @@ The configuration for the script is defined in train_save_model_config.json. The
     from_data_files: It is a boolean value (True or False) that specifies if the data comes fron a file or a database.
 
 How to extend the algorithms
-===============================
+------------------------------
 If you want to create custom algorithms, simply you can extend the existing ones from Lenskit or create new ones by extending the base classes of Predictor or Recommender.
 Then, you should modify the script train_save_model.py to import the new algorithm and then update the get_algo_class() or get_topn_algo_class() methods to include the new algorithm in the logic.
 Finally, just execute the script train_save_model.py
