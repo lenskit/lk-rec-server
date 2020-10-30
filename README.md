@@ -1,5 +1,4 @@
-# rec-service
-The Recommendation Web Service for Lenskit
+# The Recommendation Server for Lenskit
 
 The recommendation server for Lenskit is a web server that exposes LensKit’s recommendation and rating prediction capabilities.
 
