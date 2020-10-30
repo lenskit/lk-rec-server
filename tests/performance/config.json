@@ -20,6 +20,6 @@
     "lk_recserver_algos": ["bias", "biasedmf", "itemitem", "tf_bpr"],
     "rec_algos": ["popular"],
     "process_length": 6,
-    "workers_config": [1, 2, 4, 8, 12, 16, 24],
-    "inc_config": [1, 2, 4, 4, 4, 8]
+    "workers_config": [1, 2, 4, 8, 12, 16, 24, 32, 48, 80, 96],
+    "inc_config": [1, 2, 4, 4, 4, 8, 8, 16, 32, 16]
 }
