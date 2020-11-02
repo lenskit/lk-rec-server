@@ -11,6 +11,6 @@
         "server": "postgresdb",
         "database": "db",
         "pool_size": 20,
-        "port": 6000
+        "port": 5432
     }
 }

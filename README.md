@@ -16,13 +16,13 @@ To start using the recommendation server we need to follow some steps:
 
 2. As an optional step, you can create a python virtual environment or an anaconda environment.
 
-3. Install the python dependencies by executing pip install -r servicerequirements.txt
+3. Install the python dependencies by executing pip install -r lkweb/requirements.txt
 
-4. Configure your database connection and default algorithm in serviceconfig.json
+4. Configure your database connection and default algorithm in lkweb/config.cfg
 
 5. Start gunicorn. For instance, you can start it with 4 workers using the default port by running: gunicorn -w 4 wsgi:app
 
-6. Place the model files inside the service/models folder manually or upload them by using the endpoint ‘/algorithms/<algo>/modelfile’
+6. Place the model files inside the lkweb/models folder manually or upload them by using the endpoint ‘/algorithms/<algo>/modelfile’
 
 
 ## Functional testing
@@ -31,7 +31,7 @@ To make sure everything works fine, you can execute the functional tests by runn
 
 
 ## Deployment
-All the packages necessary to run the recommendation server are in service/requirements.txt file, which can be easily installed with the command: pip -r service/requirements.txt
+All the packages necessary to run the recommendation server are in lkweb/requirements.txt file, which can be easily installed with the command: pip -r lkweb/requirements.txt
 
 ### Docker-compose configuration
 If you just want to deploy the recommendation server and a postgres database in docker using data files located in test_db/ then follow these steps:
@@ -45,13 +45,13 @@ If you just want to deploy the recommendation server and a postgres database in 
 4. Run the util/train_save_model.py script to create the model files and upload them to the recommendation server.
 
 ### Docker configuration
-If you want to use a your own database, then you can build only the Dockerfile from service folder.
+If you want to use a your own database, then you can build only the Dockerfile from lkweb folder.
 
 The steps to setup the recommendation server using Docker are:
 
 1. Update the db configuration from config.cfg
 
-2. Move to the service folder: cd service
+2. Move to the lkweb folder: cd lkweb
 
 3. Build the rec server image from the Dockerfile: docker build -t rec-server .
 
@@ -64,7 +64,7 @@ The steps to setup the recommendation server without Docker are:
 
 1. Update the db configuration from config.cfg
 
-2. Install the python packages from servicerequirements.txt by calling: pip install -r requirements.txt
+2. Install the python packages from lkweb/requirements.txt by calling: pip install -r requirements.txt
 
 3. Start the recommendation server with 4 workers in gunicorn: gunicorn -w 4 wsgi:app
 

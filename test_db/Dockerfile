@@ -13,5 +13,3 @@ RUN chmod a+r /docker-entrypoint-initdb.d/*
 
 ADD files/items.csv /var/lib/postgresql
 ADD files/ratings.csv /var/lib/postgresql
-
-#EXPOSE 6000

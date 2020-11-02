@@ -6,12 +6,11 @@ services:
       dockerfile: Dockerfile
     environment:
        POSTGRES_PASSWORD: postgres
-    ports:
-      #- "5432:5432"
-      - "6000:5432"
+    ports:      
+      - "5432:5432"
   recserver:
     build:
-      context: ../service/
+      context: ../
       dockerfile: Dockerfile
     ports:
       - "5000:5000"

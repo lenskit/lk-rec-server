@@ -18,5 +18,5 @@
     "from_data_files": true,
     "upload_models": true,
     "rec_server_base_url": "http://127.0.0.1:5000/",
-    "algorithms": ["tf_bpr"]
+    "algorithms": ["bias"]
 }
