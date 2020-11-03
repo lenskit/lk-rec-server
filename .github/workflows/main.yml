@@ -20,7 +20,7 @@ jobs:
 
     - name: Install packages
       run: |
-        pip3 install -r lkweb/requirements.txt
+        pip3 install -r requirements.txt
         pip install pylint
     # - name: Run pylint
     #   run: |
