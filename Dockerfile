@@ -1,13 +1,16 @@
 FROM python:3.8-buster
 
 # We copy just the requirements.txt first to leverage Docker cache
-COPY ./lkweb/requirements.txt /app/requirements.txt
+COPY ./requirements.txt requirements.txt
 
-WORKDIR /app
+#WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-COPY ./lkweb /app
+COPY ./lkweb /lkweb
+COPY ./app.py app.py
+COPY ./wsgi.py wsgi.py
+COPY ./config.cfg config.cfg
 
 EXPOSE 5000
 

@@ -5,7 +5,7 @@ from lenskit.sharing import sharing_mode
 from datetime import datetime
 from os import path
 
-directory_path = "models"
+directory_path = "lkweb/models"
 extension = ".bpk"
 
 def store_model(data, file_name, sharingmode=True):
