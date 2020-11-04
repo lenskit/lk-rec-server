@@ -25,7 +25,7 @@ class ModelManager:
         updated_date = None
         size = 0
         if path.exists(model_file_dir_path):
-            print("Getting model information")
+            logging.info("Getting model information")
             creation_date = datetime.utcfromtimestamp(path.getctime(model_file_dir_path))
             updated_date = datetime.utcfromtimestamp(path.getmtime(model_file_dir_path))
             size = path.getsize(model_file_dir_path) / 1000
@@ -36,7 +36,7 @@ class ModelManager:
                 "size": size
             }})
         else:
-            print("No model found for the algorithm")
+            logging.info("No model found for the algorithm")
             return jsonify({'model': {}})        
 
     def upload_model(self, algo):
@@ -44,19 +44,19 @@ class ModelManager:
         if len(keys) > 0:
             file = request.files.get(keys[0], None)
             
-            print("Create folder if not exists")
+            logging.info("Create folder if not exists")
             Path(ModelManager.model_directory_path).mkdir(exist_ok=True)
             
-            print("Save the model with a temporary file name")
+            logging.info("Save the model with a temporary file name")
             temp_model_name = f'{algo}_{uuid.uuid1()}.bpk'
             temp_file_name = Path(f'{ModelManager.model_directory_path}/{temp_model_name}')
             file.save(temp_file_name)
 
-            print("Save the model with sharing mode")
+            logging.info("Save the model with sharing mode")
             temp_model = load_model(temp_model_name)
             store_model(temp_model, temp_model_name, True)
 
-            print("Rename the temp file name to the actual algorithm name")
+            logging.info("Rename the temp file name to the actual algorithm name")
             file_name = Path(f'{ModelManager.model_directory_path}/{algo}.bpk')
             os.rename(temp_file_name, file_name)
 

@@ -63,7 +63,7 @@ def get_upload_model_response(algo, http_service):
 @then('the response returns the model creation_date and size')
 def get_model_creation_date_and_size(get_trained_model_response):
     model = get_trained_model_response.json()['model']
-    print(model)
+    logging.info(model)
     assert model != "{}"
     assert model['creation_date'] != None
     assert model['size'] != 0
