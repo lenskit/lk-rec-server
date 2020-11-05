@@ -1,5 +1,6 @@
 Training & quality check process
 ==================================
+Before trying to run the train_save_model.py script, we need to install some packages that the script needs to run without issues. The best option to run it is to create a virtualenv or anaconda environment and install the packages from requirements.txt or environment.yaml, depending which one you choose.
 
 How to create the model files
 -------------------------------

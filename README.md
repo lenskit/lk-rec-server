@@ -16,9 +16,9 @@ To start using the recommendation server we need to follow some steps:
 
 2. As an optional step, you can create a python virtual environment or an anaconda environment.
 
-3. Install the python dependencies by executing pip install -r lkweb/requirements.txt
+3. Install the python dependencies by executing pip install -r requirements.txt
 
-4. Configure your database connection and default algorithm in lkweb/config.cfg
+4. Configure your database connection and default algorithm in config.cfg
 
 5. Start gunicorn. For instance, you can start it with 4 workers using the default port by running: gunicorn -w 4 wsgi:app
 
@@ -31,7 +31,7 @@ To make sure everything works fine, you can execute the functional tests by runn
 
 
 ## Deployment
-All the packages necessary to run the recommendation server are in lkweb/requirements.txt file, which can be easily installed with the command: pip -r lkweb/requirements.txt
+All the packages necessary to run the recommendation server are in requirements.txt file, which can be easily installed with the command: pip -r requirements.txt
 
 ### Docker-compose configuration
 If you just want to deploy the recommendation server and a postgres database in docker using data files located in test_db/ then follow these steps:
@@ -64,7 +64,7 @@ The steps to setup the recommendation server without Docker are:
 
 1. Update the db configuration from config.cfg
 
-2. Install the python packages from lkweb/requirements.txt by calling: pip install -r requirements.txt
+2. Install the python packages from requirements.txt by calling: pip install -r requirements.txt
 
 3. Start the recommendation server with 4 workers in gunicorn: gunicorn -w 4 wsgi:app
 
