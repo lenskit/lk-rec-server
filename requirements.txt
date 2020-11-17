@@ -35,7 +35,7 @@ Jinja2==2.11.2
 joblib==0.14.1
 jsonschema==3.2.0
 jupyter-core==4.6.3
-lenskit==0.10.1
+lenskit==0.11.1
 llvmlite==0.32.1
 Mako==1.1.3
 MarkupSafe==1.1.1
