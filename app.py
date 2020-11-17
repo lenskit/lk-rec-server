@@ -1,5 +1,4 @@
 import os
-import tensorflow as tf
 
 from flask import Flask, jsonify
 from lenskit.algorithms import Predictor, Recommender
@@ -21,11 +20,13 @@ def status():
     Returns:
         The status number 200.
     """
-    print(f"get_inter_op_parallelism_threads: {tf.config.threading.get_inter_op_parallelism_threads()}")
-    print(f"get_intra_op_parallelism_threads: {tf.config.threading.get_intra_op_parallelism_threads()}")
     print(f"NUMBA_NUM_THREADS: {os.getenv('NUMBA_NUM_THREADS')}")
     print(f"MKL_NUM_THREADS: {os.getenv('MKL_NUM_THREADS')}")
     print(f"OMP_NUM_THREADS: {os.getenv('OMP_NUM_THREADS')}")
+    if module_exists('tensorflow'):
+        import tensorflow as tf
+        print(f"get_inter_op_parallelism_threads: {tf.config.threading.get_inter_op_parallelism_threads()}")
+        print(f"get_intra_op_parallelism_threads: {tf.config.threading.get_intra_op_parallelism_threads()}")
     return jsonify({"status": 200})
 
 @app.route('/algorithms/<algo>/info', methods=['GET'])
@@ -103,15 +104,13 @@ def get_worst_predictions(results):
     """
     return jsonify({"predictions": results})
 
-# set env variables:
-def set_performance_vars():
-    os.environ['NUMBA_NUM_THREADS'] = "1"
-    os.environ['MKL_NUM_THREADS'] = "1"
-    os.environ['OMP_NUM_THREADS'] = "1"
-    tf.config.threading.set_inter_op_parallelism_threads(1)
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-
-set_performance_vars()
+def module_exists(module_name):
+    try:
+        __import__(module_name)
+    except ImportError:
+        return False
+    else:
+        return True
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
