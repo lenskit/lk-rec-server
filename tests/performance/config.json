@@ -15,10 +15,10 @@
     "num_requests": 1000,
     "n_recs": 5,
     "items": "10,20,30,40,50",
-    "pred_algos": ["bias","itemitem","useruser","biasedmf","implicitmf","funksvd","tf_bpr"],
-    "linear_speedup_algos": ["biasedmf", "itemitem", "tf_bpr"],
+    "pred_algos": ["bias","itemitem","useruser","biasedmf","implicitmf","funksvd"],
+    "linear_speedup_algos": ["biasedmf", "itemitem"],
     "lk_recserver_algos": ["bias", "biasedmf", "itemitem", "tf_bpr"],
-    "rec_algos": ["popular"],
+    "rec_algos": ["popular", "implicitmf", "tf_bpr", "itemitem"],
     "process_length": 6,
     "workers_config": [1, 2, 4, 8, 12, 16, 24, 32, 48, 80, 96],
     "inc_config": [1, 2, 4, 4, 4, 8, 8, 16, 32, 16]
