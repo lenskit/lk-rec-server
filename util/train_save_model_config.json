@@ -1,22 +1,23 @@
 {
-    "data_folder_path": "data/",
+    "data_folder_path": "~/lk-rec-server/test_db/files/",
     "models_folder_path": "models/",
     "ratings_file_name": "ratings.csv",
     "db_connection":
     {
-        "db_engine": "mysql",
-        "connector": "+mysqlconnector",
-        "user": "root",
-        "password": "root",
+        "db_engine": "postgres",
+        "connector": "+psycopg2",
+        "user": "postgres",
+        "password": "postgres",
         "server": "localhost",
         "database": "db",
-        "port": 3306
+	"pool_size": 20,
+        "port": 5432
     },
     "create_models": true,
-    "create_top_n_models": true,
-    "create_memory_optimized_models": true,
+    "create_top_n_models": false,
+    "create_memory_optimized_models": false,
     "from_data_files": true,
     "upload_models": false,
     "rec_server_base_url": "http://127.0.0.1:5000/",
-    "algorithms": ["popular", "implicitmf", "tf_bpr", "itemitem"]
+    "algorithms": ["biasedmf", "itemitem", "tf_bpr"]
 }
