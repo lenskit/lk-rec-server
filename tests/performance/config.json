@@ -2,21 +2,21 @@
     "default_algorithm": "popular",
     "db_connection":
     {
-        "db_engine": "mysql",
-        "connector": "+mysqlconnector",
-        "user": "root",
-        "password": "root",
+        "db_engine": "postgres",
+        "connector": "+psycopg2",
+        "user": "postgres",
+        "password": "postgres",
         "server": "localhost",
         "database": "db",
         "pool_size": 20,
-        "port": 3306
+        "port": 5432
     },
     "rec_server_base_url": "http://127.0.0.1:5000",
     "num_requests": 1000,
     "n_recs": 5,
     "items": "10,20,30,40,50",
     "pred_algos": ["bias","itemitem","useruser","biasedmf","implicitmf","funksvd"],
-    "linear_speedup_algos": ["biasedmf", "itemitem"],
+    "linear_speedup_algos": ["biasedmf", "itemitem", "tf_bpr"],
     "lk_recserver_algos": ["bias", "biasedmf", "itemitem", "tf_bpr"],
     "rec_algos": ["popular", "implicitmf", "tf_bpr", "itemitem"],
     "process_length": 6,

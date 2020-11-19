@@ -13,10 +13,10 @@
         "port": 3306
     },
     "create_models": true,
-    "create_top_n_models": false,
-    "create_memory_optimized_models": false,
+    "create_top_n_models": true,
+    "create_memory_optimized_models": true,
     "from_data_files": true,
-    "upload_models": true,
+    "upload_models": false,
     "rec_server_base_url": "http://127.0.0.1:5000/",
-    "algorithms": ["bias"]
+    "algorithms": ["popular", "implicitmf", "tf_bpr", "itemitem"]
 }

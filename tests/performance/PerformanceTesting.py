@@ -28,8 +28,6 @@ from time import perf_counter
 import pandas as pd
 import os
 import pickle
-import nest_asyncio
-nest_asyncio.apply()
 
 
 # # Performance Testing
@@ -62,9 +60,9 @@ class DbManager:
 
     def get_users(self):
         # postgres:
-#        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
+        return sql.read_sql("SELECT distinct \"user\" FROM rating;", create_engine(self.conn_string))
         # mysql:
-        return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
+#        return sql.read_sql("SELECT distinct user FROM rating;", create_engine(self.conn_string))
 
 
 # ## Test prediction and recommendation endpoints
@@ -184,13 +182,13 @@ def get_gunicorn_master_pid():
 def add_workers(n):
     master_id = get_gunicorn_master_pid()
     for i in range(n):
-        os.system(f"sudo kill -s TTIN {master_id}")
+        os.system(f"kill -s TTIN {master_id}")
         
 def remove_workers(n):
     master_id = get_gunicorn_master_pid()
     for i in range(n):
-        os.system(f"sudo kill -s TTOU {master_id}")    
-
+        os.system(f"kill -s TTOU {master_id}")    
+print(f'Gunicorn master: {get_gunicorn_master_pid()}')
 
 # ### Get config values
 
@@ -248,7 +246,7 @@ def warm_up(current_algo=None, num_workers=24, display_logs=True):
 # In[ ]:
 
 
-warm_up(None, 4)
+# warm_up(None, 4)
 
 
 # ### Call predict and recommend endpoints from server for canonical config
@@ -258,14 +256,14 @@ warm_up(None, 4)
 # In[ ]:
 
 
-for algo in pred_algos:
-    file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.pickle'
-    loop = asyncio.get_event_loop()
-    print(f'Algorithm: {algo}')
-    future = asyncio.ensure_future(get_preds_sem(8, algo, file_name, True))
-    loop.run_until_complete(future)
-    print('---------------------')
-    print('')
+# for algo in pred_algos:
+#     file_name = f'preds_{algo}_workers_4_num_req_{num_requests}.pickle'
+#     loop = asyncio.get_event_loop()
+#     print(f'Algorithm: {algo}')
+#     future = asyncio.ensure_future(get_preds_sem(8, algo, file_name, True))
+#     loop.run_until_complete(future)
+#     print('---------------------')
+#     print('')
 
 
 # #### Recommendations
@@ -273,14 +271,14 @@ for algo in pred_algos:
 # In[ ]:
 
 
-for algo_rec in rec_algos:
-    print(f'Algorithm: {algo_rec}')
-    file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
-    loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
-    loop.run_until_complete(future)
-    print('---------------------')
-    print('')
+# for algo_rec in rec_algos:
+#     print(f'Algorithm: {algo_rec}')
+#     file_name = f'recs_{algo_rec}_workers_4_num_req_{num_requests}.pickle'
+#     loop = asyncio.get_event_loop()
+#     future = asyncio.ensure_future(get_recs_sem(8, algo_rec, file_name))
+#     loop.run_until_complete(future)
+#     print('---------------------')
+#     print('')
 
 
 # ### Lenskit
@@ -375,35 +373,35 @@ async def get_user_preds_threads_lkpy(user, items, session, times, model):
 # In[ ]:
 
 
-import train_save_model
-lk_recserver_algos = reader.get_value('lk_recserver_algos')
-lk_recserver_algos_not_created = []
-for a in lk_recserver_algos:
-    if not exists_model_file(f'{a}.bpk'):
-        lk_recserver_algos_not_created.append(a)
-if len(lk_recserver_algos_not_created) > 0:
-    train_save_model.save_models(lk_recserver_algos_not_created)
+# import train_save_model
+# lk_recserver_algos = reader.get_value('lk_recserver_algos')
+# lk_recserver_algos_not_created = []
+# for a in lk_recserver_algos:
+#     if not exists_model_file(f'{a}.bpk'):
+#         lk_recserver_algos_not_created.append(a)
+# if len(lk_recserver_algos_not_created) > 0:
+#     train_save_model.save_models(lk_recserver_algos_not_created)
 
 
 # In[ ]:
 
 
-print('Lenskit performance:')
-for lk_recserver_algo in lk_recserver_algos:
-    print(f'Algo: {lk_recserver_algo}')
-    model = load_for_shared_mem(f'{lk_recserver_algo}.bpk')
-    file_name = f'lkpy_{lk_recserver_algo}_num_req_{num_requests}.pickle'
-    loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(get_preds_threads_lkpy(8, model, file_name))
-    loop.run_until_complete(future)
-    print('------------------')    
-    warm_up(lk_recserver_algo, 8, False)
-    print('Recommendation server performance:')
-    file_name = f'preds_{lk_recserver_algo}_against_lkpy_workers_4_num_req_{num_requests}.pickle'
-    loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(get_preds_sem(8, lk_recserver_algo, file_name, True))
-    loop.run_until_complete(future)
-    print('*******************************************************')    
+# print('Lenskit performance:')
+# for lk_recserver_algo in lk_recserver_algos:
+#     print(f'Algo: {lk_recserver_algo}')
+#     model = load_for_shared_mem(f'{lk_recserver_algo}.bpk')
+#     file_name = f'lkpy_{lk_recserver_algo}_num_req_{num_requests}.pickle'
+#     loop = asyncio.get_event_loop()
+#     future = asyncio.ensure_future(get_preds_threads_lkpy(8, model, file_name))
+#     loop.run_until_complete(future)
+#     print('------------------')    
+#     warm_up(lk_recserver_algo, 8, False)
+#     print('Recommendation server performance:')
+#     file_name = f'preds_{lk_recserver_algo}_against_lkpy_workers_4_num_req_{num_requests}.pickle'
+#     loop = asyncio.get_event_loop()
+#     future = asyncio.ensure_future(get_preds_sem(8, lk_recserver_algo, file_name, True))
+#     loop.run_until_complete(future)
+#     print('*******************************************************')    
 
 
 # ### Speedup Tests

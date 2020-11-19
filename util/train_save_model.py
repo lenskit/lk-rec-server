@@ -121,27 +121,27 @@ def save_models():
     if get_value("create_models"):
         from_data_files = get_value("from_data_files") == True
         if from_data_files:
-            logging.info('Getting data from file')
+            print('Getting data from file')
             ratings = get_ratings_from_file()
         else:
-            logging.info('Getting data from db')
+            print('Getting data from db')
             ratings = get_ratings_from_db()
 
         for algo in algos:
             algo = algo.strip()
-            logging.info(f'Creating model for {algo}')
+            print(f'Creating model for {algo}')
             model = create_model(algo, ratings)
             if model != None:
                 store(model, algo + ".bpk")
-                logging.info(f'Model {algo} saved successfully')
+                print(f'Model {algo} saved successfully')
             else:
-                logging.info(f'Algorithm {algo} not found')
+                print(f'Algorithm {algo} not found')
 
     if get_value("upload_models"):
-        logging.info('Uploading models')
+        print('Uploading models')
         for algo in algos:
             algo = algo.strip()
-            logging.info(f'Uploading model for {algo}')
+            print(f'Uploading model for {algo}')
             upload_model(algo)
 
 if __name__ == "__main__":
