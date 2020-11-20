@@ -23,6 +23,7 @@ def status():
     print(f"NUMBA_NUM_THREADS: {os.getenv('NUMBA_NUM_THREADS')}")
     print(f"MKL_NUM_THREADS: {os.getenv('MKL_NUM_THREADS')}")
     print(f"OMP_NUM_THREADS: {os.getenv('OMP_NUM_THREADS')}")
+    print(f"OPENBLAS_NUM_THREADS: {os.getenv('OPENBLAS_NUM_THREADS')}")    
     if module_exists('tensorflow'):
         import tensorflow as tf
         print(f"get_inter_op_parallelism_threads: {tf.config.threading.get_inter_op_parallelism_threads()}")
@@ -111,6 +112,15 @@ def module_exists(module_name):
         return False
     else:
         return True
+
+# set env variables:
+def set_performance_vars():
+    if module_exists('tensorflow'):
+        import tensorflow as tf
+        tf.config.threading.set_inter_op_parallelism_threads(1)
+        tf.config.threading.set_intra_op_parallelism_threads(1)
+
+set_performance_vars()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
