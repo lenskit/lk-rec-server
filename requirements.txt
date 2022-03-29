@@ -52,7 +52,7 @@ numpy==1.18.4
 packaging==20.4
 pandas==1.0.3
 pandocfilters==1.4.2
-paramiko==2.7.1
+paramiko==2.10.1
 parse==1.15.0
 parse-type==0.5.2
 pickle5==0.0.11
